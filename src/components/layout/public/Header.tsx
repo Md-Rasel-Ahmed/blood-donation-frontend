@@ -159,7 +159,6 @@ export default function Header() {
                 </PopoverContent>
               </Popover>
 
-              {/* 👤 PROFILE DROPDOWN */}
              {/* 👤 PROFILE DROPDOWN */}
 <DropdownMenu open={isProfileOpen} onOpenChange={setIsProfileOpen}>
   <DropdownMenuTrigger >
