@@ -68,7 +68,7 @@ export default function HowItWork() {
             const IconComponent = step.icon;
             return (
               <div
-                key={index}
+                key={step.number}
                 className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 relative flex flex-col justify-between group"
               >
                 {/* Step Number Tag */}
