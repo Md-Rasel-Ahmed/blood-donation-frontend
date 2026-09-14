@@ -4,10 +4,26 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useForm } from '@tanstack/react-form'
+import { loginUserZodSchema } from "@/validation";
+import { FieldError } from "@/components/ui/field";
+
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-
+ const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    validators:{
+      onSubmit:loginUserZodSchema,
+    },
+    onSubmit: async ({ value }) => {
+      console.log(value)
+      
+    },
+  })
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-slate-50/50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8 bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
@@ -31,9 +47,19 @@ export default function LoginForm() {
         </div>
 
         {/* Form */}
-        <form className="space-y-5">
+        <form  onSubmit={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          form.handleSubmit()
+        }} className="space-y-5">
           {/* Email Input */}
-          <div className="space-y-1.5">
+          <form.Field name="email">
+              {(field)=>{
+                const isInvalid=field.state.meta.isTouched && !field.state.meta.isValid
+                  
+                return (
+                 
+                     <div className="space-y-1.5">
             <span className="text-xs font-semibold text-slate-700">
               Email Address
             </span>
@@ -42,16 +68,29 @@ export default function LoginForm() {
                 <Mail className="h-4 w-4" />
               </div>
               <input
-                type="email"
-                name="email"
+                
+                name={field.name}
+                onChange={(e)=>field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+                value={field.state.value}
+
                 placeholder="name@example.com"
                 className="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-colors"
               />
             </div>
+              {isInvalid && <FieldError errors={field.state.meta.errors}/>}
           </div>
+                )
+                 
+              }}
+          </form.Field>
 
           {/* Password Input */}
-          <div className="space-y-1.5">
+          <form.Field name="password">
+             {(field)=>{
+              const isInvalid=field.state.meta.isTouched && !field.state.meta.isValid
+                 return (
+                   <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-700">
                 Password
@@ -69,7 +108,8 @@ export default function LoginForm() {
               </div>
               <input
                 type={showPassword ? "text" : "password"}
-                name="password"
+                name={field.name}
+                onChange={(e)=>field.handleChange(e.target.value)}
                 placeholder="••••••••"
                 className="w-full pl-9 pr-10 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 transition-colors"
               />
@@ -85,7 +125,12 @@ export default function LoginForm() {
                 )}
               </button>
             </div>
+              {isInvalid && <FieldError errors={field.state.meta.errors}/>}
           </div>
+                 )
+             }}
+          </form.Field>
+         
 
           {/* Submit Button */}
           <Button
