@@ -39,10 +39,7 @@ export default function Header() {
   const router = useRouter();
 
   // Auth & Notifications Data
-  const user = {
-    name: "Rasel",
-    role: "DONOR", // 'PATIENT' | 'DONOR' | 'ADMIN'
-  };
+  const user =undefined
 
   const notifications = [
     {

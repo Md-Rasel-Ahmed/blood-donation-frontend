@@ -7,20 +7,49 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { loginUserZodSchema } from "@/validation";
 import { FieldError } from "@/components/ui/field";
+import { useLogin } from "@/hooks";
+import { useRouter } from "next/navigation";
+import { toast, Toast } from "@/components/ui/toast";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const {mutate:login,isPending}=useLogin()
+ const router=useRouter()
 
   const form = useForm({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "admin@gmail.com",
+      password: "admin11",
     },
     validators: {
       onSubmit: loginUserZodSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log("Form Values:", value);
+
+    
+      const loginPayload={
+        email:value.email,
+        password:value.password
+      }
+    login(loginPayload,{
+      onSuccess:(res)=>{
+        toast.add({
+  title:res.message,
+  description: new Date().toLocaleString(),
+  type:"success"
+})
+router.push("/")
+      },
+
+      onError:(err)=>{
+         toast.add({
+  title:"Something went wrong",
+  description: new Date().toLocaleString(),
+  type:"error"
+})
+      }
+    })
+     
       // Backend API call here
     },
   });
@@ -76,6 +105,7 @@ export default function LoginForm() {
                     <input
                       id={field.name}
                       name={field.name}
+                      
                       value={field.state.value}
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
