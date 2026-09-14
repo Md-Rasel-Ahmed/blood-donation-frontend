@@ -6,3 +6,13 @@ export const userLogin=(payload:{email:string,password:string})=>{
         body:payload
     })
 }
+export const userLogout=()=>{
+    return apiClient("/auth/logout",{
+        method:"POST",
+       
+    })
+}
+
+export const getMe=()=>{
+    return apiClient("/users/get-me")
+}

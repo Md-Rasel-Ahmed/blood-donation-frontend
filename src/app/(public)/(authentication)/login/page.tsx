@@ -25,8 +25,6 @@ export default function LoginForm() {
       onSubmit: loginUserZodSchema,
     },
     onSubmit: async ({ value }) => {
-
-    
       const loginPayload={
         email:value.email,
         password:value.password
@@ -50,7 +48,7 @@ router.push("/")
       }
     })
      
-      // Backend API call here
+   
     },
   });
 

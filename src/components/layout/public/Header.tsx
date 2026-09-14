@@ -32,14 +32,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useGetMe, useLogout } from "@/hooks";
+import { toast } from "@/components/ui/toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const router = useRouter();
 
+  const {data:user,isLoading}=useGetMe()
+ const {mutate:logout,isPending}=useLogout()
+   const queryClient=useQueryClient()
   // Auth & Notifications Data
-  const user =undefined
+  // const user =undefined
 
   const notifications = [
     {
@@ -57,9 +63,22 @@ export default function Header() {
   ];
 
   const handleLogout = () => {
+  
     setIsProfileOpen(false);
     setIsMobileMenuOpen(false);
-    router.push("/login");
+   logout(undefined,{
+    onSuccess:(res)=>{
+      console.log(res);
+      toast.add({
+        title:res.message,
+        type:"success"
+      })
+      queryClient.removeQueries({queryKey:["user"]})
+    },
+    onError:(err)=>{
+      console.log(err);
+    }
+   })
   };
 
   return (
@@ -82,7 +101,7 @@ export default function Header() {
             Home
           </Link>
 
-          {user?.role === "DONOR" && (
+          {user?.data.role === "DONOR" && (
             <Link
               href="/matching-requests"
               className="flex items-center gap-1.5 hover:text-rose-600 transition-colors"
@@ -92,7 +111,7 @@ export default function Header() {
             </Link>
           )}
 
-          {user?.role === "PATIENT" && (
+          {user?.data.role === "PATIENT" && (
             <Link href="/create-request">
               <Button
                 variant="outline"
@@ -105,7 +124,7 @@ export default function Header() {
             </Link>
           )}
 
-          {user?.role === "ADMIN" && (
+          {user?.data.role === "ADMIN" && (
             <Link
               href="/admin/dashboard"
               className="flex items-center gap-1.5 font-semibold text-slate-800 hover:text-rose-600 transition-colors"
@@ -118,7 +137,7 @@ export default function Header() {
 
         {/* Desktop Right Actions */}
         <div className="hidden md:flex items-center gap-3">
-          {user ? (
+          {!isLoading && user?.data ? (
             <>
               {/* 🔔 NOTIFICATION POPOVER */}
               <Popover>
@@ -165,7 +184,7 @@ export default function Header() {
     >
       <Avatar className="h-8 w-8 bg-rose-600 text-white">
         <AvatarFallback className="bg-rose-600 text-white font-semibold">
-          {user.name.charAt(0)}
+          {user?.data.name.charAt(0)}
         </AvatarFallback>
       </Avatar>
       <span className="text-sm font-medium text-slate-700">
@@ -181,9 +200,9 @@ export default function Header() {
     <DropdownMenuGroup>
       <DropdownMenuLabel className="font-normal p-2">
         <div className="flex flex-col space-y-1">
-          <p className="text-sm font-medium leading-none">{user.name}</p>
+          <p className="text-sm font-medium leading-none">{user?.data.name}</p>
           <p className="text-xs font-semibold text-rose-600 uppercase">
-            {user.role}
+            {user?.data.role}
           </p>
         </div>
       </DropdownMenuLabel>
@@ -208,7 +227,7 @@ export default function Header() {
     
     <DropdownMenuGroup>
       <DropdownMenuItem
-        onSelect={handleLogout}
+        onClick={handleLogout}
         className="cursor-pointer text-red-600 focus:bg-red-50 focus:text-red-600 flex items-center gap-2 w-full p-2 rounded-md"
       >
         <LogOut className="h-4 w-4" />
@@ -285,12 +304,12 @@ export default function Header() {
             <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50/60 border border-rose-100">
               <Avatar className="h-10 w-10 bg-rose-600 text-white">
                 <AvatarFallback className="bg-rose-600 text-white font-semibold">
-                  {user.name.charAt(0)}
+                  {user?.data.name.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-slate-800">{user.name}</span>
-                <span className="text-xs font-bold text-rose-600 uppercase">{user.role}</span>
+                <span className="text-sm font-semibold text-slate-800">{user?.data.name}</span>
+                <span className="text-xs font-bold text-rose-600 uppercase">{user?.data.role}</span>
               </div>
             </div>
           )}
@@ -305,7 +324,7 @@ export default function Header() {
               Home
             </Link>
 
-            {user?.role === "DONOR" && (
+            {user?.data.role === "DONOR" && (
               <Link
                 href="/matching-requests"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -316,7 +335,7 @@ export default function Header() {
               </Link>
             )}
 
-            {user?.role === "PATIENT" && (
+            {user?.data.role === "PATIENT" && (
               <Link
                 href="/create-request"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -327,7 +346,7 @@ export default function Header() {
               </Link>
             )}
 
-            {user?.role === "ADMIN" && (
+            {user?.data.role === "ADMIN" && (
               <Link
                 href="/admin/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -338,7 +357,7 @@ export default function Header() {
               </Link>
             )}
 
-            {user && (
+            {user?.data && (
               <Link
                 href="/profile"
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -352,7 +371,7 @@ export default function Header() {
 
           {/* Mobile Auth Actions */}
           <div className="pt-2 border-t border-slate-100">
-            {user ? (
+            {user?.data ? (
               <Button
                 variant="destructive"
                 className="w-full justify-center gap-2 bg-rose-600 hover:bg-rose-700"
