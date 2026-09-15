@@ -20,16 +20,20 @@ import {
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { createUserZodSchema } from "@/validation";
+import { useRegister } from "@/hooks";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const {mutate:register,isPending}=useRegister()
+  const router=useRouter()
 
   const form = useForm({
     defaultValues: {
       fullName: "",
       email: "",
       phone: "",
-      role: "donor",
+      role:"DONOR",
       district: "",
       upazila: "",
       address: "",
@@ -41,6 +45,26 @@ export default function RegisterForm() {
     onSubmit: async ({ value }) => {
       console.log("Registration Values:", value);
       // Backend registration API call here
+  
+      const registerpayload={
+         name: value.fullName,
+         email: value.email,
+         phone: value.phone,
+         role: value.role.toUpperCase(),
+         district:value.district,
+         upazila: value.upazila,
+         address: value.address,
+         password: value.password,
+      }
+      register(registerpayload,{
+        onSuccess:(res)=>{
+           
+          router.push(`/register/EmailVerification?email=${registerpayload.email}`)
+        },
+        onError:(err)=>{
+          console.log(err);
+        }
+      })
     },
   });
 

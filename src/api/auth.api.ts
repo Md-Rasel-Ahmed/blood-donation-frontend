@@ -19,3 +19,16 @@ export const gooleLoginCallback=()=>{
 export const getMe=()=>{
     return apiClient("/users/get-me")
 }
+
+export const register=(payload:any)=>{
+     return apiClient("/auth/singup",{
+        method:"POST",
+        body:payload
+    })
+}
+export const verifyEmail=(payload:{email:string,otp:string})=>{
+        return apiClient("auth/verify-email",{
+        method:"POST",
+        body:payload
+    })
+}

@@ -1,4 +1,4 @@
-import { getMe, gooleLoginCallback, userLogin, userLogout } from "@/api"
+import { getMe, gooleLoginCallback, register, userLogin, userLogout, verifyEmail } from "@/api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useLogin=()=>{
@@ -25,5 +25,17 @@ export const useGetMe=()=>{
         queryKey:["user"],
         queryFn:getMe,
         retry:false
+    })
+}
+
+export const useRegister=()=>{
+    return useMutation({
+        mutationFn:register
+    })
+}
+
+export const useVerifyEmail=()=>{
+     return useMutation({
+        mutationFn:verifyEmail
     })
 }
