@@ -1,4 +1,4 @@
-import { getMe, userLogin, userLogout } from "@/api"
+import { getMe, gooleLoginCallback, userLogin, userLogout } from "@/api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useLogin=()=>{
@@ -10,6 +10,13 @@ export const useLogout=()=>{
     return useMutation({
         mutationFn:userLogout,
     
+    })
+}
+export const useGooleLoginCallback=()=>{
+   return useQuery({
+        queryKey:["goole"],
+        queryFn:gooleLoginCallback,
+        retry:false
     })
 }
 

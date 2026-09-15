@@ -74,6 +74,7 @@ export default function Header() {
         type:"success"
       })
       queryClient.removeQueries({queryKey:["user"]})
+      router.push("/login")
     },
     onError:(err)=>{
       console.log(err);
@@ -211,16 +212,15 @@ export default function Header() {
     <DropdownMenuSeparator />
     
     <DropdownMenuGroup>
+      <Link href={"/profile"}>
       <DropdownMenuItem 
-        onSelect={() => {
-          setIsProfileOpen(false);
-          router.push("/profile");
-        }} 
+      
         className="cursor-pointer flex items-center gap-2 w-full p-2 hover:bg-rose-50 rounded-md"
       >
         <User className="h-4 w-4" />
         <span>My Profile</span>
       </DropdownMenuItem>
+      </Link>
     </DropdownMenuGroup>
     
     <DropdownMenuSeparator />

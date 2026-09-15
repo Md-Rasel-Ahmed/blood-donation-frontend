@@ -12,6 +12,9 @@ export const userLogout=()=>{
        
     })
 }
+export const gooleLoginCallback=()=>{
+    return apiClient("/google/login/callback")
+}
 
 export const getMe=()=>{
     return apiClient("/users/get-me")
