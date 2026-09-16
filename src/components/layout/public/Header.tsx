@@ -235,10 +235,16 @@ export default function Header() {
                   <DropdownMenuSeparator />
 
                   <DropdownMenuGroup>
-                    <Link href={"/profile"}>
+                    <Link href={"/dashboard"}>
                       <DropdownMenuItem className="cursor-pointer flex items-center gap-2 w-full p-2 hover:bg-rose-50 rounded-md">
                         <User className="h-4 w-4" />
                         <span>My Profile</span>
+                      </DropdownMenuItem>
+                    </Link>
+                    <Link href={"/dashboard"}>
+                      <DropdownMenuItem className="cursor-pointer flex items-center gap-2 w-full p-2 hover:bg-rose-50 rounded-md">
+                        <User className="h-4 w-4" />
+                        <span>Dashboard</span>
                       </DropdownMenuItem>
                     </Link>
                   </DropdownMenuGroup>

@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useGetMyBloodRequests } from "@/hooks";
 import Link from "next/link";
+import { Spinner } from "@/components/ui/spinner";
 
 const MOCK_REQUESTS = [
   {
@@ -83,7 +84,6 @@ export default function MyBloodRequests() {
         return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
-  console.log(myBloodRequests?.data.data);
 
   return (
     <div className="space-y-6">
@@ -124,7 +124,14 @@ export default function MyBloodRequests() {
           </Button>
         </div>
       </div>
-
+      {isLoading && (
+        <div className="flex justify-center items-center">
+          <Button className="text-white bg-red-400" disabled size="sm">
+            <Spinner data-icon="inline-start" />
+            Please wait
+          </Button>
+        </div>
+      )}
       {/* Request Cards / List */}
       <div className="grid grid-cols-1 gap-4">
         {myBloodRequests?.data?.data.length > 0 &&

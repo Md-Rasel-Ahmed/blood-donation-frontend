@@ -30,24 +30,30 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { data: user, isLoading } = useGetMe();
 
   const patientRoutes = [
+    { name: "Dashboard", url: "/dashboard" },
     {
       name: "Create Blood Request",
       url: "/dashboard/patient/create-blood-request",
     },
     { name: "My Blood Requests", url: "/dashboard/patient/my-blood-requests" },
+    { name: "Profile", url: "/dashboard/patient/profile" },
   ];
   const donorRoutes = [
+    { name: "Dashboard", url: "/dashboard" },
     {
       name: "Create Donor Profile",
       url: "/dashboard/donor/create-donor-profile",
     },
     { name: "Donation History", url: "/dashboard/donor/donation-history" },
     { name: "Match Requests", url: "/dashboard/donor/match-request" },
+    { name: "Profile", url: "/dashboard/donor/profile" },
   ];
   const adminRoutes = [
+    { name: "Dashboard", url: "/dashboard" },
     { name: "All Users", url: "/dashboard/patient/create-blood-request" },
     { name: "All Donor", url: "/dashboard/patient/my-blood-requests" },
     { name: "All Blood Requests", url: "/dashboard/patient/my-blood-requests" },
+    { name: "Profile", url: "/dashboard/admin/profile" },
   ];
 
   const routes = useMemo(() => {

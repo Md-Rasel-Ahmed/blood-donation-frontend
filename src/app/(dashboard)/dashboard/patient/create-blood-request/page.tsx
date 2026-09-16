@@ -17,13 +17,14 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { useCreateBloodRequest } from "@/hooks";
 import { toast } from "@/components/ui/toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 const BLOOD_GROUPS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
 export default function CreateBloodRequestUI() {
   const [selectedFileName, setSelectedFileName] = useState<string | null>(null);
   const { mutate: createBloodReq, isPending } = useCreateBloodRequest();
-
+  const queryClient = useQueryClient();
   const form = useForm({
     defaultValues: {
       patientName: "Mariyam Rahman",
@@ -60,6 +61,7 @@ export default function CreateBloodRequestUI() {
           toast.add({
             title: res.message || "Blood Request Create Successfull",
           });
+          queryClient.invalidateQueries({ queryKey: ["bloodRequest"] });
         },
         onError: (err: any) => {
           const errorMessage =

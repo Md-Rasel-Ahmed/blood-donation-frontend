@@ -8,7 +8,7 @@ export const useCreateBloodRequest=()=>{
 }
 export const useGetMyBloodRequests=()=>{
     return useQuery({
-        queryKey:["patient"],
+        queryKey:["bloodRequest"],
         queryFn:getMyBloodRequests,
        
     })
