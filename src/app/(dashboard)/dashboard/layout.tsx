@@ -85,7 +85,10 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 bg-rose-500/10 border border-rose-500/20 rounded-xl flex items-center justify-center text-rose-500">
-              <Droplet className="w-5 h-5 fill-rose-500" />
+              <Link href={"/"}>
+                {" "}
+                <Droplet className="w-5 h-5 fill-rose-500" />
+              </Link>
             </div>
             <span className="text-lg font-bold tracking-tight text-white hidden sm:inline-block">
               LifeFlow
