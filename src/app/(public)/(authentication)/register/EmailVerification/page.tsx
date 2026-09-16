@@ -91,7 +91,7 @@ export default function EmailOtpVerificationUI() {
           title: res.message || "Email Verification Code Sent",
           type: "success",
         });
-        setTimeLeft(300); // Resend সফল হলে টাইমার আবার ৫ মিনিটে রিসেট হবে
+        setTimeLeft(300);
       },
       onError: (err: any) => {
         const errorMessage =
