@@ -1,4 +1,5 @@
 import apiClient from "@/lib/apiClient"
+import { IRegister } from "@/types/IRegister"
 
 export const userLogin=(payload:{email:string,password:string})=>{
     return apiClient("/auth/login",{
@@ -20,14 +21,20 @@ export const getMe=()=>{
     return apiClient("/users/get-me")
 }
 
-export const register=(payload:any)=>{
+export const register=(payload:IRegister)=>{
      return apiClient("/auth/singup",{
         method:"POST",
         body:payload
     })
 }
 export const verifyEmail=(payload:{email:string,otp:string})=>{
-        return apiClient("auth/verify-email",{
+        return apiClient("/auth/verify-email",{
+        method:"POST",
+        body:payload
+    })
+}
+export const resendOTP=(payload:{email:string})=>{
+        return apiClient("/auth/sent-otp",{
         method:"POST",
         body:payload
     })

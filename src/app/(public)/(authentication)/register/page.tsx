@@ -22,18 +22,19 @@ import { useForm } from "@tanstack/react-form";
 import { createUserZodSchema } from "@/validation";
 import { useRegister } from "@/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "@/components/ui/toast";
 
 export default function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const {mutate:register,isPending}=useRegister()
-  const router=useRouter()
+  const { mutate: register, isPending } = useRegister();
+  const router = useRouter();
 
   const form = useForm({
     defaultValues: {
       fullName: "",
       email: "",
       phone: "",
-      role:"DONOR",
+      role: "",
       district: "",
       upazila: "",
       address: "",
@@ -45,33 +46,48 @@ export default function RegisterForm() {
     onSubmit: async ({ value }) => {
       console.log("Registration Values:", value);
       // Backend registration API call here
-  
-      const registerpayload={
-         name: value.fullName,
-         email: value.email,
-         phone: value.phone,
-         role: value.role.toUpperCase(),
-         district:value.district,
-         upazila: value.upazila,
-         address: value.address,
-         password: value.password,
-      }
-      register(registerpayload,{
-        onSuccess:(res)=>{
-           
-          router.push(`/register/EmailVerification?email=${registerpayload.email}`)
+
+      const registerpayload = {
+        name: value.fullName,
+        email: value.email,
+        phone: value.phone,
+        role: value.role.toUpperCase(),
+        district: value.district,
+        upazila: value.upazila,
+        address: value.address,
+        password: value.password,
+      };
+      console.log(registerpayload);
+      register(registerpayload, {
+        onSuccess: (res) => {
+          toast.add({
+            title: res.message || "OTP sent to your email!",
+            type: "success",
+          });
+          router.push(
+            `/register/EmailVerification?email=${registerpayload.email}`,
+          );
         },
-        onError:(err)=>{
+        onError: (err: any) => {
           console.log(err);
-        }
-      })
+          const errorMessage =
+            err?.data?.message ||
+            err?.data?.error ||
+            err?.message ||
+            "Something Went Wrong";
+
+          toast.add({
+            title: errorMessage,
+            type: "error",
+          });
+        },
+      });
     },
   });
 
   return (
     <div className="min-h-[90vh] flex items-center justify-center bg-slate-50/50 px-4 py-12 sm:px-6 lg:px-8">
       <div className="w-full max-w-xl space-y-6 bg-white p-8 rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50">
-        
         {/* Header / Logo */}
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-2 group mb-1">
@@ -101,7 +117,6 @@ export default function RegisterForm() {
         >
           {/* Name & Email Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
             {/* Full Name Field */}
             <form.Field name="fullName">
               {(field) => {
@@ -112,7 +127,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       Full Name
                     </label>
                     <div className="relative">
@@ -136,9 +154,13 @@ export default function RegisterForm() {
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -161,7 +183,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       Email Address
                     </label>
                     <div className="relative">
@@ -186,9 +211,13 @@ export default function RegisterForm() {
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -200,12 +229,10 @@ export default function RegisterForm() {
                 );
               }}
             </form.Field>
-
           </div>
 
           {/* Phone & Role Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
             {/* Phone Field */}
             <form.Field name="phone">
               {(field) => {
@@ -216,7 +243,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       Phone Number
                     </label>
                     <div className="relative">
@@ -241,9 +271,13 @@ export default function RegisterForm() {
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -266,7 +300,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       Account Role
                     </label>
                     <div className="relative">
@@ -285,16 +322,20 @@ export default function RegisterForm() {
                             : "border-slate-200 focus:border-rose-500 focus:ring-1 focus:ring-rose-500"
                         }`}
                       >
-                        <option value="donor">Donor</option>
-                        <option value="Patient">Patient</option>
+                        <option value="PATIENT">PATIENT</option>
+                        <option value="DONOR">DONOR</option>
                       </select>
                     </div>
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -306,12 +347,10 @@ export default function RegisterForm() {
                 );
               }}
             </form.Field>
-
           </div>
 
           {/* District & Upazila Row */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
             {/* District Field */}
             <form.Field name="district">
               {(field) => {
@@ -322,7 +361,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       District
                     </label>
                     <div className="relative">
@@ -347,9 +389,13 @@ export default function RegisterForm() {
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -372,7 +418,10 @@ export default function RegisterForm() {
 
                 return (
                   <div className="space-y-1.5">
-                    <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                    <label
+                      htmlFor={field.name}
+                      className="text-xs font-semibold text-slate-700"
+                    >
                       Upazila
                     </label>
                     <div className="relative">
@@ -397,9 +446,13 @@ export default function RegisterForm() {
                     {isInvalid && (
                       <div className="space-y-1">
                         {field.state.meta.errors.map((error, index) => {
-                          const errMessage = typeof error === "string" ? error : error?.message;
+                          const errMessage =
+                            typeof error === "string" ? error : error?.message;
                           return (
-                            <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                            <div
+                              key={`${field.name}-err-${index}`}
+                              className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                            >
                               <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                               <span>{errMessage}</span>
                             </div>
@@ -411,7 +464,6 @@ export default function RegisterForm() {
                 );
               }}
             </form.Field>
-
           </div>
 
           {/* Address Field */}
@@ -424,7 +476,10 @@ export default function RegisterForm() {
 
               return (
                 <div className="space-y-1.5">
-                  <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                  <label
+                    htmlFor={field.name}
+                    className="text-xs font-semibold text-slate-700"
+                  >
                     Full Address
                   </label>
                   <div className="relative">
@@ -449,9 +504,13 @@ export default function RegisterForm() {
                   {isInvalid && (
                     <div className="space-y-1">
                       {field.state.meta.errors.map((error, index) => {
-                        const errMessage = typeof error === "string" ? error : error?.message;
+                        const errMessage =
+                          typeof error === "string" ? error : error?.message;
                         return (
-                          <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                          <div
+                            key={`${field.name}-err-${index}`}
+                            className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                          >
                             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                             <span>{errMessage}</span>
                           </div>
@@ -474,7 +533,10 @@ export default function RegisterForm() {
 
               return (
                 <div className="space-y-1.5">
-                  <label htmlFor={field.name} className="text-xs font-semibold text-slate-700">
+                  <label
+                    htmlFor={field.name}
+                    className="text-xs font-semibold text-slate-700"
+                  >
                     Password
                   </label>
                   <div className="relative">
@@ -510,9 +572,13 @@ export default function RegisterForm() {
                   {isInvalid && (
                     <div className="space-y-1">
                       {field.state.meta.errors.map((error, index) => {
-                        const errMessage = typeof error === "string" ? error : error?.message;
+                        const errMessage =
+                          typeof error === "string" ? error : error?.message;
                         return (
-                          <div key={`${field.name}-err-${index}`} className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5">
+                          <div
+                            key={`${field.name}-err-${index}`}
+                            className="flex items-center gap-1.5 text-xs text-rose-600 font-medium pt-0.5"
+                          >
                             <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                             <span>{errMessage}</span>
                           </div>
@@ -526,17 +592,15 @@ export default function RegisterForm() {
           </form.Field>
 
           {/* Submit Button */}
-          <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-            {([canSubmit, isSubmitting]) => (
-              <Button
-                type="submit"
-                disabled={!canSubmit || isSubmitting}
-                className="w-full bg-rose-600 hover:bg-rose-700 text-white gap-2 font-medium py-2.5 rounded-lg transition-colors mt-2 disabled:opacity-50"
-              >
-                {isSubmitting ? "Registering..." : "Register Now"}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
+          <form.Subscribe>
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-rose-600 hover:bg-rose-700 text-white gap-2 font-medium py-2.5 rounded-lg transition-colors mt-2 disabled:opacity-50"
+            >
+              {isPending ? "Registering..." : "Register Now"}
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </form.Subscribe>
         </form>
 

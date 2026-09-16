@@ -64,12 +64,18 @@ useEffect(() => {
 router.push("/")
       },
 
-      onError:(err)=>{
-         toast.add({
-  title:"Something went wrong",
-  description: new Date().toLocaleString(),
-  type:"error"
-})
+      onError: (err: any) => {
+       
+        const errorMessage = 
+          err?.data?.message || 
+          err?.data?.error || 
+          err?.message || 
+          "Something Went Wrong";
+      
+        toast.add({
+          title: errorMessage,
+          type: "error",
+        });
       }
     })
      
