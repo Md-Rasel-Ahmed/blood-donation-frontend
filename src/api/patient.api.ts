@@ -15,3 +15,9 @@ export const getAllBloodRequests=()=>{
 export const getBloodReqById=(id:string)=>{
         return apiClient(`/patient/blood-requests/${id}/responses`)
 }
+export const updateRequest=(payload:any)=>{
+       return apiClient(`patient/bloodRequiest/${payload.id}`,{
+            method:"PATCH",
+            body:payload.value
+        })
+}

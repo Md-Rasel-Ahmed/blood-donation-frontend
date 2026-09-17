@@ -21,6 +21,7 @@ import { useGetMyBloodRequests } from "@/hooks";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodReqModal";
+import EditBloodReq from "@/components/layout/dashboard/patient/EditBloodReq";
 
 const MOCK_REQUESTS = [
   {
@@ -68,6 +69,8 @@ export default function MyBloodRequests() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [isOpen, setIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
+  const [editIsOpen, setEditIsOpen] = useState(false);
+  const [editOnClose, setEditOnClose] = useState();
 
   const { data: myBloodRequests, isLoading } = useGetMyBloodRequests();
 
@@ -92,8 +95,14 @@ export default function MyBloodRequests() {
     setSelectedId(id);
     setIsOpen(true);
   };
+
+  const handleEditBloodReq = (id: string) => {
+    setSelectedId(id);
+    setEditIsOpen(true);
+  };
   const handleCloseModal = () => {
     setIsOpen(false);
+    setEditIsOpen(false);
     setSelectedId("");
   };
   return (
@@ -243,6 +252,7 @@ export default function MyBloodRequests() {
 
                   {/* Edit Request */}
                   <Button
+                    onClick={() => handleEditBloodReq(request.id)}
                     title="Edit Request"
                     className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
                   >
@@ -262,10 +272,17 @@ export default function MyBloodRequests() {
           ))}
       </div>
       <ViewBloodReqModal
+        key={selectedId}
         id={selectedId}
         isOpen={isOpen}
         onClose={handleCloseModal}
       ></ViewBloodReqModal>
+      <EditBloodReq
+        key={selectedId}
+        id={selectedId}
+        editIsOpen={editIsOpen}
+        editOnClose={handleCloseModal}
+      ></EditBloodReq>
     </div>
   );
 }
