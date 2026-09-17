@@ -12,3 +12,6 @@ export const getMyBloodRequests=()=>{
 export const getAllBloodRequests=()=>{
         return apiClient("/patient/blood-requests")
 }
+export const getBloodReqById=(id:string)=>{
+        return apiClient(`/patient/blood-requests/${id}/responses`)
+}

@@ -178,7 +178,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                   // className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-rose-500/10 text-rose-500 border border-rose-500/20 transition-all"
                   className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? "bg-rose-500/10 text-rose-500 border border-rose-500/20 shadow-sm" // Active Class
+                      ? "bg-rose-500/10 text-rose-500   shadow-sm" // Active Class
                       : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60" // Normal Class
                   }`}
                 >

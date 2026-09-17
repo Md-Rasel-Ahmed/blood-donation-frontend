@@ -20,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { useGetMyBloodRequests } from "@/hooks";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
+import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodReqModal";
 
 const MOCK_REQUESTS = [
   {
@@ -65,6 +66,8 @@ const MOCK_REQUESTS = [
 
 export default function MyBloodRequests() {
   const [filterStatus, setFilterStatus] = useState("All");
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState("");
 
   const { data: myBloodRequests, isLoading } = useGetMyBloodRequests();
 
@@ -85,6 +88,14 @@ export default function MyBloodRequests() {
     }
   };
 
+  const handleViewRequest = (id: string) => {
+    setSelectedId(id);
+    setIsOpen(true);
+  };
+  const handleCloseModal = () => {
+    setIsOpen(false);
+    setSelectedId("");
+  };
   return (
     <div className="space-y-6">
       {/* Header & Filter Section */}
@@ -223,6 +234,7 @@ export default function MyBloodRequests() {
                 <div className="flex items-center gap-2">
                   {/* View Details */}
                   <Button
+                    onClick={() => handleViewRequest(request.id)}
                     title="View Details"
                     className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
                   >
@@ -249,6 +261,11 @@ export default function MyBloodRequests() {
             </div>
           ))}
       </div>
+      <ViewBloodReqModal
+        id={selectedId}
+        isOpen={isOpen}
+        onClose={handleCloseModal}
+      ></ViewBloodReqModal>
     </div>
   );
 }
