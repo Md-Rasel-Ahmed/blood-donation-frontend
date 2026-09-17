@@ -1,4 +1,4 @@
-import { createBloodRequest, getAllBloodRequests, getBloodReqById, getMyBloodRequests, updateRequest } from "@/api/patient.api"
+import { confirmDonorResponse, createBloodRequest, getAllBloodRequests, getBloodReqById, getMyBloodRequests, updateRequest, updateRequestStatus } from "@/api/patient.api"
 import { useMutation, useQuery } from "@tanstack/react-query"
 
 export const useCreateBloodRequest=()=>{
@@ -31,5 +31,15 @@ export const useGetBloodReqById=(id:string)=>{
 export const useUpdateBloodRequest=()=>{
     return useMutation({
         mutationFn:updateRequest
+    })
+}
+export const useUpdateBloodRequestStatus=()=>{
+    return useMutation({
+        mutationFn:updateRequestStatus
+    })
+}
+export const useConfirmDonorResponse=()=>{
+    return useMutation({
+        mutationFn:confirmDonorResponse
     })
 }

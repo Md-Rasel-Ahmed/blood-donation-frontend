@@ -17,11 +17,12 @@ import {
   Filter,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useGetMyBloodRequests } from "@/hooks";
+import { useGetMyBloodRequests, useUpdateBloodRequestStatus } from "@/hooks";
 import Link from "next/link";
 import { Spinner } from "@/components/ui/spinner";
 import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodReqModal";
 import EditBloodReq from "@/components/layout/dashboard/patient/EditBloodReq";
+import { toast } from "@/components/ui/toast";
 
 const MOCK_REQUESTS = [
   {
@@ -67,12 +68,15 @@ const MOCK_REQUESTS = [
 
 export default function MyBloodRequests() {
   const [filterStatus, setFilterStatus] = useState("All");
-  const [isOpen, setIsOpen] = useState(false);
+  const [viewIsOpen, setViewIsOpen] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [editIsOpen, setEditIsOpen] = useState(false);
-  const [editOnClose, setEditOnClose] = useState();
+  const [editOnClose, setEditOnClose] = useState(true);
+  const [viewOnClose, setViewOnClose] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState("");
 
-  const { data: myBloodRequests, isLoading } = useGetMyBloodRequests();
+  const { data: myBloodRequests, isLoading, refetch } = useGetMyBloodRequests();
+  const { mutate: updateStatus, isPending } = useUpdateBloodRequestStatus();
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -93,7 +97,7 @@ export default function MyBloodRequests() {
 
   const handleViewRequest = (id: string) => {
     setSelectedId(id);
-    setIsOpen(true);
+    setViewIsOpen(true);
   };
 
   const handleEditBloodReq = (id: string) => {
@@ -101,10 +105,49 @@ export default function MyBloodRequests() {
     setEditIsOpen(true);
   };
   const handleCloseModal = () => {
-    setIsOpen(false);
     setEditIsOpen(false);
+
     setSelectedId("");
+    refetch();
   };
+  const handleViewCloseModal = () => {
+    setViewIsOpen(false);
+    setViewOnClose(true);
+    setSelectedId("");
+    refetch();
+  };
+
+  const handleUpdateStatus = (id) => {
+    console.log(id, selectedStatus);
+    const payload = {
+      status: selectedStatus,
+    };
+    updateStatus(
+      { id, payload },
+      {
+        onSuccess: (res) => {
+          toast.add({
+            title: res.message || "Blood Request Status Update Successfull",
+            type: "success",
+          });
+          refetch();
+        },
+        onError: (err: any) => {
+          const errorMessage =
+            err?.data?.message ||
+            err?.data?.error ||
+            err?.message ||
+            "Something Went Wrong";
+
+          toast.add({
+            title: errorMessage,
+            type: "error",
+          });
+        },
+      },
+    );
+  };
+  console.log(myBloodRequests);
   return (
     <div className="space-y-6">
       {/* Header & Filter Section */}
@@ -160,14 +203,11 @@ export default function MyBloodRequests() {
               key={request.id}
               className="bg-slate-900 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-5 sm:p-6 transition-all space-y-4"
             >
-              {/* Top Bar: Blood Group, Patient Name & Status */}
+              {/* Top Bar: Blood Group, Patient Name & Current Status */}
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {/* Blood Group Badge */}
                   <div className="w-12 h-12 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col items-center justify-center text-rose-500 font-bold leading-none">
-                    {/* <span className="text-base text-sm">
-                      {request.bloodGroup}
-                    </span> */}
                     <span className="text-[9px] uppercase font-normal text-slate-400 mt-0.5">
                       {request.bagsNeeded} Bag
                       {request.bagsNeeded > 1 ? "s" : ""}
@@ -199,7 +239,6 @@ export default function MyBloodRequests() {
                   </div>
                 </div>
 
-                {/* Status Badge */}
                 <span
                   className={`text-xs px-3 py-1 rounded-full font-semibold border ${getStatusBadge(
                     request.status,
@@ -235,37 +274,62 @@ export default function MyBloodRequests() {
               </div>
 
               {/* Actions Footer */}
-              <div className="flex items-center justify-between border-t border-slate-800/80 pt-3.5">
-                <span className="text-[11px] text-slate-500">
-                  ID: {request.id}
-                </span>
-
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between border-t border-slate-800/80 pt-3.5 gap-3">
+                {/* Inline Status Select & Update Button */}
                 <div className="flex items-center gap-2">
-                  {/* View Details */}
-                  <Button
-                    onClick={() => handleViewRequest(request.id)}
-                    title="View Details"
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                  <select
+                    defaultValue={request.status}
+                    onChange={(e) => setSelectedStatus(e.target.value)}
+                    className="bg-slate-950 text-slate-300 text-xs px-2.5 py-1.5 rounded-xl border border-slate-800 focus:outline-none focus:border-slate-700 cursor-pointer"
                   >
-                    <Eye className="w-4 h-4" />
-                  </Button>
+                    <option value="PENDING">PENDING</option>
+                    <option value="ACCEPTED">ACCEPTED</option>
+                    <option value="FULFILLED">FULFILLED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                    <option value="EXPIRED">EXPIRED</option>
+                  </select>
 
-                  {/* Edit Request */}
                   <Button
-                    onClick={() => handleEditBloodReq(request.id)}
-                    title="Edit Request"
-                    className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                    onClick={() =>
+                      handleUpdateStatus(request.id, selectedStatus)
+                    }
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-xl transition-colors cursor-pointer"
                   >
-                    <Edit3 className="w-4 h-4" />
+                    Update Status
                   </Button>
+                  <Link
+                    href={`/dashboard/patient/my-blood-requests/${request.id}/donor-response`}
+                    className="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white text-xs font-medium rounded-xl transition-colors cursor-pointer"
+                  >
+                    Show Response Donors
+                  </Link>
+                </div>
 
-                  {/* Delete Request */}
-                  <Button
-                    title="Delete Request"
-                    className="p-2 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 rounded-xl border border-rose-500/20 transition-colors cursor-pointer"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
+                {/* Right Actions */}
+                <div className="flex items-center justify-between sm:justify-end gap-3">
+                  <span className="text-[11px] text-slate-500">
+                    ID: {request.id}
+                  </span>
+
+                  <div className="flex items-center gap-2">
+                    {/* View Details */}
+                    <Button
+                      onClick={() => handleViewRequest(request.id)}
+                      title="View Details"
+                      className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                    >
+                      <Eye className="w-4 h-4" />
+                    </Button>
+
+                    {/* Edit Request */}
+                    <Button
+                      onClick={() => handleEditBloodReq(request.id)}
+                      title="Edit Request"
+                      className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                    >
+                      <Edit3 className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -274,8 +338,8 @@ export default function MyBloodRequests() {
       <ViewBloodReqModal
         key={selectedId}
         id={selectedId}
-        isOpen={isOpen}
-        onClose={handleCloseModal}
+        viewIsOpen={viewIsOpen}
+        viewOnClose={handleViewCloseModal}
       ></ViewBloodReqModal>
       <EditBloodReq
         key={selectedId}

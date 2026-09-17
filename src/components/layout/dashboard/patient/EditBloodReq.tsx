@@ -39,7 +39,11 @@ export default function EditBloodReq({
   editIsOpen,
   editOnClose,
 }: EditBloodReqProps) {
-  const { data: bloodReqById, isLoading } = useGetBloodReqById(id as string);
+  const {
+    data: bloodReqById,
+    isLoading,
+    refetch,
+  } = useGetBloodReqById(id as string);
   const { mutate: updateReq, isPending } = useUpdateBloodRequest();
   const queryClient = useQueryClient();
   // Form State
@@ -69,7 +73,6 @@ export default function EditBloodReq({
       });
     }
   }, [bloodReqById]);
-  console.log(formData);
   const form = useForm({
     defaultValues: formData,
 
@@ -80,6 +83,7 @@ export default function EditBloodReq({
             title: res.message || "Blood Request Update Successfull",
             type: "success",
           });
+          refetch();
           queryClient.invalidateQueries({
             queryKey: ["bloodRequest", variables.id],
           });

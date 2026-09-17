@@ -22,19 +22,20 @@ import {
 
 interface ViewBloodReqProps {
   id: string | null;
-  isOpen: boolean;
-  onClose: () => void;
+  viewIsOpen: boolean;
+  viewOnClose: () => void;
 }
 
 export default function ViewBloodReqModal({
   id,
-  isOpen,
-  onClose,
+  viewIsOpen,
+  viewOnClose,
 }: ViewBloodReqProps) {
   const { data: bloodReqById, isLoading } = useGetBloodReqById(id as string);
-  console.log(bloodReqById);
+
+  console.log(viewOnClose);
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={viewIsOpen} onOpenChange={viewOnClose}>
       <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-white p-6 sm:p-8 rounded-3xl shadow-2xl">
         <DialogHeader className="border-b border-slate-800 pb-4">
           <DialogTitle className="text-xl sm:text-2xl font-bold flex items-center gap-2">

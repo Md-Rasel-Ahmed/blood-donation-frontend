@@ -30,7 +30,7 @@ export default function CreateBloodRequestUI() {
       patientName: "Mariyam Rahman",
       bloodGroup: "AB+",
       bagsNeeded: 2,
-      urgency: "Normal",
+      urgency: "NORMAL",
       hospitalName: "Dhaka Medical College Hospital",
       district: "Dhaka",
       upazila: "Shahbagh",
@@ -215,16 +215,22 @@ export default function CreateBloodRequestUI() {
                       className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-rose-400 font-medium focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition-all"
                     >
                       <option
-                        value="Normal"
+                        value="NORMAL"
                         className="bg-slate-900 text-slate-100"
                       >
-                        Normal
+                        NORMAL
                       </option>
                       <option
-                        value="Critical"
+                        value="CRITICAL"
                         className="bg-slate-900 text-rose-500"
                       >
-                        Critical (Immediate)
+                        CRITICAL (Immediate)
+                      </option>
+                      <option
+                        value="EMERGENCY"
+                        className="bg-slate-900 text-rose-500"
+                      >
+                        EMERGENCY
                       </option>
                     </select>
                   </div>
