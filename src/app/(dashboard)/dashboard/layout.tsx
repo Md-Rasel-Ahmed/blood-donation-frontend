@@ -45,14 +45,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       url: "/dashboard/donor/create-donor-profile",
     },
     { name: "Donation History", url: "/dashboard/donor/donation-history" },
-    { name: "Match Requests", url: "/dashboard/donor/match-request" },
+    { name: "Match Requests", url: "/dashboard/donor/match-requests" },
     { name: "Profile", url: "/dashboard/donor/profile" },
   ];
   const adminRoutes = [
     { name: "Dashboard", url: "/dashboard" },
-    { name: "All Users", url: "/dashboard/patient/create-blood-request" },
-    { name: "All Donor", url: "/dashboard/patient/my-blood-requests" },
-    { name: "All Blood Requests", url: "/dashboard/patient/my-blood-requests" },
+    { name: "All Users", url: "/dashboard/admin/all-users" },
+    { name: "All Donor", url: "/dashboard/admin/all-donors" },
+    { name: "All Blood Requests", url: "/dashboard/admin/all-blood-requests" },
     { name: "Profile", url: "/dashboard/admin/profile" },
   ];
 
