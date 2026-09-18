@@ -14,7 +14,7 @@ export const useLogout=()=>{
 }
 export const useGooleLoginCallback=()=>{
    return useQuery({
-        queryKey:["goole"],
+        queryKey:["user"],
         queryFn:gooleLoginCallback,
         retry:false
     })
