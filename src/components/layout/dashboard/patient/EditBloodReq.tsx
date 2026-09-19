@@ -380,11 +380,12 @@ export default function EditBloodReq({
                 <span>Cancel</span>
               </Button>
               <Button
+                disabled={isPending}
                 type="submit"
                 className="bg-rose-600 hover:bg-rose-700 text-white font-medium rounded-xl px-5 py-2 flex items-center gap-2 cursor-pointer shadow-lg shadow-rose-600/20"
               >
                 <Save className="w-4 h-4" />
-                <span>Save Changes</span>
+                <span>{isPending ? "Saving..." : "Save Changes"}</span>
               </Button>
             </DialogFooter>
           </form>

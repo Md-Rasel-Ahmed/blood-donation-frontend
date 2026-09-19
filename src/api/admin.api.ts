@@ -1,0 +1,11 @@
+import apiClient from "@/lib/apiClient"
+import { IUser } from "@/types/IUser"
+import { TApiResponse } from "@/types/TApiResponse"
+import { TQueryPrams } from "@/types/TQueryPrams";
+
+export const getAllUsers=(params:TQueryPrams)=>{
+    console.log(params);
+    return apiClient<TApiResponse<IUser[]>>("admin/all-users",{
+        params,
+    })
+}
