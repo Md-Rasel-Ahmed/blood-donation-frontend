@@ -17,14 +17,15 @@ import {
   Users,
 } from "lucide-react";
 import { useGetAllUsers } from "@/hooks/admin.hook";
-import AllUserLoading from "@/components/layout/dashboard/admin/AllUserLoading";
 import { TQueryPrams } from "@/types/TQueryPrams";
+
+import AllUserLoading from "@/components/layout/dashboard/admin/AllUserLoading";
 
 export default function GetAllUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(5);
 
   const queryPrams: TQueryPrams = {
     sortOrder: sortOrder,
@@ -68,7 +69,7 @@ export default function GetAllUsers() {
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name, email or phone..."
+            placeholder="Search by Email Or Address..."
             className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors"
           />
         </div>
@@ -106,10 +107,10 @@ export default function GetAllUsers() {
           <ListOrdered className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <select
             value={limit}
-            onChange={(e) => setLimit(e.target.value)}
+            onChange={(e) => setLimit(Number(e.target.value))}
             className="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-3 py-2 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors cursor-pointer appearance-none"
           >
-            <option value="2">Show 2 per page</option>
+            <option value="5">Show 5 per page</option>
             <option value="10">Show 10 per page</option>
             <option value="20">Show 20 per page</option>
             <option value="50">Show 50 per page</option>

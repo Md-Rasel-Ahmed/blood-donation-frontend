@@ -4,6 +4,8 @@ export type TQueryPrams ={
     sortOrder?:string,
     status?:string,
     searchTerm?:string,
-    limit:number,
+    limit?:number,
+    bloodGroup?:string,
+    urgency?:string
    
 }
