@@ -11,71 +11,14 @@ import {
   Droplet,
   CheckCircle2,
   Award,
+  Loader2,
 } from "lucide-react";
+import { useGetDonationHistory } from "@/hooks/donor.hook";
+import moment from "moment";
 
-export interface DonationRecord {
-  id: string;
-  patientName: string;
-  hospitalName: string;
-  location: string;
-  bloodGroup: string;
-  donatedAt: string; // "2026-05-10T10:00:00.000Z"
-  status?: "COMPLETED" | "PENDING" | "CANCELLED";
-  bagsDonated?: number;
-}
-
-interface DonationHistoryProps {
-  history?: DonationRecord[];
-  totalDonations?: number;
-}
-
-// তারিখ ফরম্যাট করার হেলপার ফানশন
-const formatDate = (dateString: string) => {
-  if (!dateString) return "N/A";
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-US", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-};
-
-// রক্তের গ্রুপ ফরম্যাট করার হেলপার ফানশন
-const formatBloodGroup = (bg: string) => {
-  if (!bg) return "";
-  return bg.replace("_POSITIVE", "+").replace("_NEGATIVE", "-");
-};
-
-// ডামি ডাটা (API কানেক্ট না থাকলে এগুলো দেখাবে)
-const defaultHistory: DonationRecord[] = [
-  {
-    id: "don-1",
-    patientName: "Rahim Uddin",
-    hospitalName: "Dhaka Medical College Hospital",
-    location: "Dhaka",
-    bloodGroup: "O_POSITIVE",
-    donatedAt: "2026-05-10T10:00:00.000Z",
-    status: "COMPLETED",
-    bagsDonated: 1,
-  },
-  {
-    id: "don-2",
-    patientName: "Sumaiya Akter",
-    hospitalName: "Square Hospital",
-    location: "Dhanmondi, Dhaka",
-    bloodGroup: "O_POSITIVE",
-    donatedAt: "2025-12-15T11:30:00.000Z",
-    status: "COMPLETED",
-    bagsDonated: 1,
-  },
-];
-
-export default function DonationHistory({
-  history = defaultHistory,
-  totalDonations,
-}: DonationHistoryProps) {
-  const donationCount = totalDonations ?? history.length;
-
+export default function DonationHistory() {
+  const { data: donations, isPending } = useGetDonationHistory();
+  console.log(donations);
   return (
     <div className="w-full max-w-3xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl my-6">
       {/* Header Section */}
@@ -95,14 +38,23 @@ export default function DonationHistory({
           <Award className="w-4 h-4 text-amber-400" />
           <span className="text-xs text-slate-300 font-medium">
             Total Donations:{" "}
-            <strong className="text-amber-400 text-sm">{donationCount}</strong>
+            <strong className="text-amber-400 text-sm">
+              {donations?.data.length}
+            </strong>
           </span>
         </div>
       </div>
 
+      {isPending && (
+        <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
+          <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+          <p className="text-sm font-medium">Loading Donations History...</p>
+        </div>
+      )}
+
       {/* History List */}
       <div className="space-y-4">
-        {history.length === 0 ? (
+        {donations?.data.length === 0 ? (
           <div className="py-12 text-center text-slate-500 bg-slate-950/40 rounded-2xl border border-slate-800/50">
             <Droplet className="w-10 h-10 text-slate-700 mx-auto mb-3 animate-pulse" />
             <p className="text-sm font-medium">
@@ -110,7 +62,7 @@ export default function DonationHistory({
             </p>
           </div>
         ) : (
-          history.map((item) => (
+          donations?.data.map((item) => (
             <div
               key={item.id}
               className="bg-slate-950/70 border border-slate-800/80 hover:border-slate-700/80 rounded-2xl p-4 sm:p-5 transition-all space-y-3.5 relative overflow-hidden"
@@ -120,7 +72,8 @@ export default function DonationHistory({
                 <div className="flex items-center gap-3">
                   {/* Blood Badge */}
                   <div className="w-11 h-11 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-center justify-center text-rose-500 font-bold text-sm shadow-inner">
-                    {formatBloodGroup(item.bloodGroup)}
+                    {/* {formatBloodGroup(item.bloodGroup)} */}
+                    {item.request.bloodGroup.slice(0, 3)}
                   </div>
 
                   <div>
@@ -130,7 +83,8 @@ export default function DonationHistory({
                     </h3>
                     <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
                       <Calendar className="w-3.5 h-3.5 text-rose-400" />
-                      <span>Donated on: {formatDate(item.donatedAt)}</span>
+
+                      {moment(item.lastDonatedAt).format("lll")}
                     </p>
                   </div>
                 </div>
@@ -146,12 +100,14 @@ export default function DonationHistory({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-slate-900/60 p-3 rounded-xl border border-slate-800/60 text-xs">
                 <div className="flex items-center gap-2 text-slate-300">
                   <Building2 className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{item.hospitalName}</span>
+                  <span className="truncate">{item.request.hospitalName}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-slate-300">
                   <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                  <span className="truncate">{item.location}</span>
+                  <span className="truncate">
+                    {item.request.upazila},{item.request.district}
+                  </span>
                 </div>
               </div>
             </div>

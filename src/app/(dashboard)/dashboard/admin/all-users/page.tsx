@@ -16,26 +16,70 @@ import {
   User as UserIcon,
   Users,
 } from "lucide-react";
-import { useGetAllUsers } from "@/hooks/admin.hook";
+import { useDeleteUser, useGetAllUsers } from "@/hooks/admin.hook";
 import { TQueryPrams } from "@/types/TQueryPrams";
-
+import Swal from "sweetalert2";
 import AllUserLoading from "@/components/layout/dashboard/admin/AllUserLoading";
+import { toast } from "@/components/ui/toast";
+import EditUserModal from "@/components/layout/dashboard/admin/EditUserModal";
+import { IUser } from "@/types/IUser";
+import { useDebounce } from "@/hooks/debounce.hook";
 
 export default function GetAllUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("desc");
   const [limit, setLimit] = useState(5);
+  const debounceValue = useDebounce(searchTerm);
+
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [user, setUser] = useState({});
 
   const queryPrams: TQueryPrams = {
     sortOrder: sortOrder,
     status: selectedStatus === "ALL" ? undefined : selectedStatus,
-    searchTerm: searchTerm,
+    searchTerm: debounceValue,
     limit: Number(limit),
   };
 
-  const { data: users, isPending } = useGetAllUsers(queryPrams);
+  const { data: users, isPending, refetch } = useGetAllUsers(queryPrams);
+  const { mutate: deleteUser } = useDeleteUser();
   const allUsers = users?.data.data || [];
+
+  // delete user
+  const handleUserDelete = (email: string) => {
+    Swal.fire({
+      title: "Do you want to delete this user?",
+      // showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed)
+        deleteUser(email, {
+          onSuccess: (res) => {
+            Swal.fire("User delete successfull", "", "success");
+          },
+          onError: (err: any) => {
+            const errorMessage =
+              err?.data?.message ||
+              err?.data?.error ||
+              err?.message ||
+              "Something Went Wrong";
+
+            toast.add({
+              title: errorMessage,
+              type: "error",
+            });
+          },
+        });
+    });
+  };
+
+  // eidt user
+  const handleUserEdit = (user: IUser) => {
+    setUser(user);
+    setIsOpenModal(true);
+  };
 
   return (
     <div className="w-full max-w-6xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl my-6 space-y-6">
@@ -145,7 +189,7 @@ export default function GetAllUsers() {
               allUsers.map((user) => (
                 <tr
                   key={user.id}
-                  className="hover:bg-slate-950/50 transition-colors"
+                  className={`hover:bg-slate-950/50 transition-colors ${user.isDeleted && "line-through"}`}
                 >
                   {/* User Info */}
                   <td className="p-4">
@@ -202,18 +246,21 @@ export default function GetAllUsers() {
                   </td>
 
                   {/* Actions */}
-                  <td className="p-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
+                  <td className="p-4 text-right ">
+                    <div className="flex items-center justify-end gap-2 line-through">
                       <Button
                         size="icon"
                         variant="outline"
+                        onClick={() => handleUserEdit(user)}
                         className="w-8 h-8 bg-slate-950 border-slate-800 hover:bg-slate-800 text-slate-300 rounded-lg cursor-pointer"
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </Button>
                       <Button
                         size="icon"
+                        disabled={user.isDeleted}
                         variant="outline"
+                        onClick={() => handleUserDelete(user.email)}
                         className="w-8 h-8 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 rounded-lg cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -226,6 +273,13 @@ export default function GetAllUsers() {
           </tbody>
         </table>
       </div>
+      <EditUserModal
+        isOpen={isOpenModal}
+        onClose={() => setIsOpenModal(false)}
+        user={user}
+        refetch={refetch}
+        setOnClose={setIsOpenModal}
+      ></EditUserModal>
     </div>
   );
 }

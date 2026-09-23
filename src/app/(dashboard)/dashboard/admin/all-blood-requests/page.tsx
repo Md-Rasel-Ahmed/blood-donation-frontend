@@ -19,10 +19,20 @@ import {
   Clock3,
   Edit,
   Trash2,
+  Eye,
 } from "lucide-react";
-import { useGetAllBloodRequest } from "@/hooks/admin.hook";
+import {
+  useDeleteFakeBloodReq,
+  useGetAllBloodRequest,
+  useUpdateBloodReqStatus,
+} from "@/hooks/admin.hook";
 import { TQueryPrams } from "@/types/TQueryPrams";
 import moment from "moment";
+import AllUserLoading from "@/components/layout/dashboard/admin/AllUserLoading";
+import Swal from "sweetalert2";
+import { toast } from "@/components/ui/toast";
+import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodReqModal";
+import { useDebounce } from "@/hooks/debounce.hook";
 
 export default function GetAllBloodRequests() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,18 +40,83 @@ export default function GetAllBloodRequests() {
   const [urgency, setUrgency] = useState("");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [limit, setLimit] = useState("10");
+  const [selectedId, setSelectedId] = useState("");
+  const [viewIsOpen, setViewIsOpen] = useState(false);
+  const debounceValue = useDebounce(searchTerm);
+
   const params: TQueryPrams = {
-    searchTerm,
+    searchTerm: debounceValue,
     urgency: urgency === "ALL" ? undefined : urgency,
     status: selectedStatus === "ALL" ? undefined : selectedStatus,
     sortOrder,
     limit: Number(limit),
   };
-  const { data, isPending } = useGetAllBloodRequest(params);
-
+  const { data, isPending, refetch } = useGetAllBloodRequest(params);
+  const { mutate: deleteFakeBloodReq } = useDeleteFakeBloodReq();
+  const { mutate: updateBloodReqStatus } = useUpdateBloodReqStatus();
   const requests = data?.data.data || [];
-  console.log(requests);
+  const handleUserDelete = (email: string) => {
+    Swal.fire({
+      title: "Do you want to delete this Request?",
+      // showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed)
+        deleteFakeBloodReq(email, {
+          onSuccess: (res) => {
+            Swal.fire(
+              res.message || "Deleted Fake Blood Request",
+              "",
+              "success",
+            );
+            refetch();
+          },
+          onError: (err: any) => {
+            const errorMessage =
+              err?.data?.message ||
+              err?.data?.error ||
+              err?.message ||
+              "Something Went Wrong";
 
+            toast.add({
+              title: errorMessage,
+              type: "error",
+            });
+          },
+        });
+    });
+  };
+
+  const handleViewRequest = (id: string) => {
+    setSelectedId(id);
+    setViewIsOpen(true);
+  };
+
+  // blood request status update
+  const handleUpdateStatus = (id: string) => {
+    updateBloodReqStatus(id, {
+      onSuccess: (res) => {
+        toast.add({
+          title: res.message || "Blood Request Verify Successfull",
+          type: "success",
+        });
+        refetch();
+      },
+      onError: (err: any) => {
+        const errorMessage =
+          err?.data?.message ||
+          err?.data?.error ||
+          err?.message ||
+          "Something Went Wrong";
+
+        toast.add({
+          title: errorMessage,
+          type: "error",
+        });
+      },
+    });
+  };
   return (
     <div className="w-full max-w-6xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl my-6 space-y-6">
       {/* Top Header */}
@@ -154,6 +229,10 @@ export default function GetAllBloodRequests() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/70 text-xs sm:text-sm">
+            {isPending &&
+              [1, 2, 3].map((item) => (
+                <AllUserLoading key={item}></AllUserLoading>
+              ))}
             {requests.length === 0 ? (
               <tr>
                 <td colSpan={7} className="py-10 text-center text-slate-500">
@@ -272,9 +351,18 @@ export default function GetAllBloodRequests() {
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <Button
+                        onClick={() => handleViewRequest(req.id)}
+                        title="View Details"
+                        className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
+                      <Button
                         size="icon"
                         variant="outline"
-                        title="Edit Request"
+                        disabled={req.status === "ACCEPTED"}
+                        title="Update Status"
+                        onClick={() => handleUpdateStatus(req.id)}
                         className="w-8 h-8 bg-slate-950 border-slate-800 hover:bg-slate-800 text-slate-300 rounded-lg cursor-pointer"
                       >
                         <Edit className="w-3.5 h-3.5" />
@@ -283,6 +371,7 @@ export default function GetAllBloodRequests() {
                         size="icon"
                         variant="outline"
                         title="Delete Request"
+                        onClick={() => handleUserDelete(req.id)}
                         className="w-8 h-8 bg-rose-500/10 border-rose-500/20 hover:bg-rose-500/20 text-rose-400 rounded-lg cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -295,6 +384,12 @@ export default function GetAllBloodRequests() {
           </tbody>
         </table>
       </div>
+      <ViewBloodReqModal
+        key={selectedId}
+        id={selectedId}
+        viewIsOpen={viewIsOpen}
+        // viewOnClose={handleViewCloseModal}
+      ></ViewBloodReqModal>
     </div>
   );
 }

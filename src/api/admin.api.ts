@@ -6,7 +6,7 @@ import { TApiResponse } from "@/types/TApiResponse"
 import { TQueryPrams } from "@/types/TQueryPrams";
 
 export const getAllUsers=(params:TQueryPrams)=>{
-    console.log(params);
+    
     return apiClient<TApiResponse<IUser[]>>("admin/all-users",{
         params,
     })
@@ -22,4 +22,18 @@ export const getAllBloodRequest=(params:TQueryPrams)=>{
     return apiClient<TApiResponse<IBloodRequest[]>>("admin/blood-requests",{
         params,
     })
+}
+
+export const deleteUser=(email:string)=>{
+  
+    return apiClient(`admin/users/${email}`,{method:"DELETE"})
+}
+export const deleteFaceBloodReq=(id:string)=>{
+    return apiClient(`admin/blood-requests/${id}`,{method:"DELETE"})
+}
+export const updateUser=(payload:{email:string,status:string | undefined,isDeleted:boolean})=>{
+    return apiClient(`admin/user-status`,{method:"PATCH",body:payload})
+}
+export const updateBloodReqStatus=(id:string)=>{
+    return apiClient(`admin/blood-requests/${id}`,{method:"PATCH",})
 }

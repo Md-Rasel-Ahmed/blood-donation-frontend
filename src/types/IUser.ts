@@ -8,6 +8,7 @@ export interface IUser  {
   email: string;
   phone?: string;
   role: TUserRole;
+  isDeleted:boolean,
   status: TUserStatus;
   createdAt: string;
 }

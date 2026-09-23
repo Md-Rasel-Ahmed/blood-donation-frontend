@@ -13,15 +13,17 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useGetMe } from "@/hooks";
+import moment from "moment";
 
 export default function Profile() {
   const { data: userProfile, isLoading } = useGetMe();
+
   console.log(userProfile);
   const user = {
     name: userProfile?.data.name || "Jhon Dou",
     email: userProfile?.data.email || "jhon@example.com",
     phone: userProfile?.data.phone || "+880 1712-345678",
-    bloodGroup: userProfile?.data.bloodGroup || "O+",
+    bloodGroup: userProfile?.data.donor.bloodGroup || "N/A",
     location: userProfile?.data.address || "Dhaka, Bangladesh",
     lastDonationDate: userProfile?.data.donor?.lastDonatedAt || "00,00,00",
     bio: "Regular blood donor. Ready to help anytime in emergency situations.",
@@ -120,14 +122,41 @@ export default function Profile() {
             <p className="text-base font-semibold text-white">{user.phone}</p>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <Droplet className="w-3.5 h-3.5 text-slate-500" /> Blood Group
-            </p>
-            <p className="text-base font-semibold text-rose-400">
-              {user.bloodGroup}
-            </p>
-          </div>
+          {userProfile?.data.role === "DONOR" && (
+            <>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  <Droplet className="w-3.5 h-3.5 text-slate-500" /> Blood Group
+                </p>
+                <p className="text-base font-semibold text-rose-400">
+                  {user.bloodGroup}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  <Droplet className="w-3.5 h-3.5 text-slate-500" />
+                  Is Available?
+                </p>
+                <p className="text-base font-semibold ">
+                  {userProfile?.data.donor.isAvailable ? (
+                    <span className="text-green-400">Yes</span>
+                  ) : (
+                    <span className="text-rose-400">No</span>
+                  )}
+                </p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-slate-500" />
+                  Last Donation Date
+                </p>
+                <p className="text-base font-semibold ">
+                  {userProfile?.data.donor.lastDonatedAt} /
+                  {moment(userProfile?.data.donor.lastDonatedAt).fromNow()}
+                </p>
+              </div>
+            </>
+          )}
 
           <div className="space-y-1">
             <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
@@ -135,16 +164,6 @@ export default function Profile() {
             </p>
             <p className="text-base font-semibold text-white">
               {user.location}
-            </p>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-500" /> Last Donation
-              Date
-            </p>
-            <p className="text-base font-semibold text-white">
-              {user.lastDonationDate || "Not donated yet"}
             </p>
           </div>
 

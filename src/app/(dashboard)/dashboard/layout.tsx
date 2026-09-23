@@ -15,11 +15,12 @@ import {
   Search,
 } from "lucide-react";
 import { Button } from "@base-ui/react";
-import { useGetMe } from "@/hooks";
+import { useGetMe, useLogout } from "@/hooks";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import AuthGaurd from "@/components/auth/auth-guard";
 import AuthLoading from "@/components/auth/AuthLoading";
+import { toast } from "@/components/ui/toast";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -31,23 +32,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
 
   const { data: user, isPending, isError } = useGetMe();
-
-  // useEffect(() => {
-  //   if (isPending) {
-  //     return;
-  //   }
-  //   if (isError || !user?.data) {
-  //     router.replace("/login");
-  //   }
-  // }, [user, router, isError, isPending]);
-
-  // if (isPending) {
-  //   return <AuthLoading label="Verifying Account..."></AuthLoading>;
-  // }
-
-  // if (isError || !user?.data) {
-  //   return <AuthLoading label="Redirecting User..."></AuthLoading>;
-  // }
+  const { mutate: logout } = useLogout();
 
   const patientRoutes = [
     { name: "Dashboard", url: "/dashboard" },
@@ -83,12 +68,28 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       case "DONOR":
         return donorRoutes;
       case "ADMIN":
-        console.log("role admi");
         return adminRoutes;
       default:
         return [];
     }
   }, [user?.data.role]);
+
+  // logout
+  const handleLogout = () => {
+    logout(undefined, {
+      onSuccess: (res) => {
+        console.log(res);
+        toast.add({
+          title: res.message,
+          type: "success",
+        });
+        router.push("/login");
+      },
+      onError: (err) => {
+        console.log(err);
+      },
+    });
+  };
 
   return (
     <AuthGaurd>
@@ -223,6 +224,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
               <button
                 type="button"
+                onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-rose-400 hover:bg-rose-500/10 transition-all"
               >
                 <LogOut className="w-4 h-4" />

@@ -13,59 +13,53 @@ import {
   Loader2,
   HeartHandshake,
 } from "lucide-react";
+import { useGetMe } from "@/hooks";
+import { useForm } from "@tanstack/react-form";
+import { useCreateDonorProfile } from "@/hooks/donor.hook";
+import { toast } from "@/components/ui/toast";
 
-interface CreateDonorProfileFormProps {
-  onSubmit?: (data: {
-    name: string;
-    phone: string;
-    location: string;
-    bloodGroup: string;
-    lastDonatedAt: string;
-    totalDonations: number;
-  }) => void;
-  isLoading?: boolean;
-}
+export default function CreateDonorProfileForm() {
+  const { data: user } = useGetMe();
+  const { mutate: createDonorProfile, isPending } = useCreateDonorProfile();
 
-export default function CreateDonorProfileForm({
-  onSubmit,
-  isLoading = false,
-}: CreateDonorProfileFormProps) {
-  const [formData, setFormData] = useState({
-    name: "",
-    phone: "",
-    location: "",
-    bloodGroup: "O_POSITIVE",
-    lastDonatedAt: "",
-    totalDonations: 0,
+  const form = useForm({
+    defaultValues: {
+      name: user?.data.name,
+      phone: user?.data.phone,
+      address: user?.data.address,
+      bloodGroup: "",
+      totalDonation: "",
+      lastDonation: "",
+    },
+
+    onSubmit: async ({ value }) => {
+      const payload = {
+        bloodGroup: value.bloodGroup,
+        lastDonatedAt: new Date(value.lastDonation),
+        totalDonations: Number(value.totalDonation),
+      };
+      createDonorProfile(payload, {
+        onSuccess: (res) => {
+          toast.add({
+            title: res.message || "Donor Profile Create Successfull",
+            type: "success",
+          });
+        },
+        onError: (err: any) => {
+          const errorMessage =
+            err?.data?.message ||
+            err?.data?.error ||
+            err?.message ||
+            "Something Went Wrong";
+
+          toast.add({
+            title: errorMessage,
+            type: "error",
+          });
+        },
+      });
+    },
   });
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? Number(value) : value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // ISO string ফরম্যাটে তারিখ রূপান্তর (API এর সাথে মিল রাখতে)
-    const payload = {
-      ...formData,
-      lastDonatedAt: formData.lastDonatedAt
-        ? new Date(formData.lastDonatedAt).toISOString()
-        : new Date().toISOString(),
-    };
-
-    if (onSubmit) {
-      onSubmit(payload);
-    } else {
-      console.log("Submitted Payload:", payload);
-    }
-  };
 
   return (
     <div className="w-full max-w-xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl my-6">
@@ -80,120 +74,179 @@ export default function CreateDonorProfileForm({
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          form.handleSubmit();
+        }}
+        className="space-y-5"
+      >
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Full Name */}
-          <div className="space-y-1.5 sm:col-span-2">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-slate-400" /> Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="e.g. John Doe"
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
-            />
-          </div>
+
+          <form.Field name="name">
+            {(field) => {
+              return (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-slate-400" /> Full Name
+                  </span>
+                  <input
+                    id={field.name}
+                    readOnly
+                    disabled
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    placeholder="e.g. John Doe"
+                    className="w-full bg-gray-500 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
 
           {/* Phone Number */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-slate-400" /> Phone Number
-            </label>
-            <input
-              type="text"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="01700000000"
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
-            />
-          </div>
+          <form.Field name="phone">
+            {(field) => {
+              return (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-slate-400" /> Phone
+                    Number
+                  </span>
+                  <input
+                    id={field.name}
+                    readOnly
+                    disabled
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    placeholder="01700000000"
+                    className="w-full bg-gray-500 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
 
           {/* Location */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-slate-400" /> Location
-            </label>
-            <input
-              type="text"
-              name="location"
-              value={formData.location}
-              onChange={handleChange}
-              placeholder="e.g. Dhaka"
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
-            />
-          </div>
+          <form.Field name="address">
+            {(field) => {
+              return (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-slate-400" /> Location
+                  </span>
+                  <input
+                    id={field.name}
+                    readOnly
+                    disabled
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    className="w-full bg-gray-500 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
 
           {/* Blood Group */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <Droplet className="w-3.5 h-3.5 text-slate-400" /> Blood Group
-            </label>
-            <select
-              name="bloodGroup"
-              value={formData.bloodGroup}
-              onChange={handleChange}
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors cursor-pointer"
-            >
-              <option value="A_POSITIVE">A+</option>
-              <option value="A_NEGATIVE">A-</option>
-              <option value="B_POSITIVE">B+</option>
-              <option value="B_NEGATIVE">B-</option>
-              <option value="O_POSITIVE">O+</option>
-              <option value="O_NEGATIVE">O-</option>
-              <option value="AB_POSITIVE">AB+</option>
-              <option value="AB_NEGATIVE">AB-</option>
-            </select>
-          </div>
+          <form.Field name="bloodGroup">
+            {(field) => {
+              return (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <Droplet className="w-3.5 h-3.5 text-slate-400" /> Blood
+                    Group
+                  </span>
+                  <select
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors cursor-pointer"
+                  >
+                    <option value="A_POSITIVE">A+</option>
+                    <option value="A_NEGATIVE">A-</option>
+                    <option value="B_POSITIVE">B+</option>
+                    <option value="B_NEGATIVE">B-</option>
+                    <option value="O_POSITIVE">O+</option>
+                    <option value="O_NEGATIVE">O-</option>
+                    <option value="AB_POSITIVE">AB+</option>
+                    <option value="AB_NEGATIVE">AB-</option>
+                  </select>
+                </div>
+              );
+            }}
+          </form.Field>
 
           {/* Total Donations */}
-          <div className="space-y-1.5">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <Award className="w-3.5 h-3.5 text-slate-400" /> Total Donations
-            </label>
-            <input
-              type="number"
-              name="totalDonations"
-              min="0"
-              value={formData.totalDonations}
-              onChange={handleChange}
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
-            />
-          </div>
+          <form.Field name="totalDonation">
+            {(field) => {
+              return (
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5 text-slate-400" /> Total
+                    Donations
+                  </span>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
 
           {/* Last Donated At */}
-          <div className="space-y-1.5 sm:col-span-2">
-            <label className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" /> Last Donated
-              Date
-            </label>
-            <input
-              type="datetime-local"
-              name="lastDonatedAt"
-              value={formData.lastDonatedAt}
-              onChange={handleChange}
-              required
-              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
-            />
-          </div>
+          <form.Field name="lastDonation">
+            {(field) => {
+              return (
+                <div className="space-y-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-slate-300 flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5 text-slate-400" /> Last
+                    Donated Date
+                  </span>
+                  <input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    onBlur={field.handleBlur}
+                    autoComplete="off"
+                    type="date"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white focus:outline-none focus:border-rose-500 transition-colors"
+                  />
+                </div>
+              );
+            }}
+          </form.Field>
         </div>
 
         {/* Submit Button */}
         <div className="border-t border-slate-800 pt-5 flex justify-end">
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={isPending}
             className="w-full sm:w-auto bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl px-6 py-2.5 text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-rose-600/20 transition-all cursor-pointer"
           >
-            {isLoading ? (
+            {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
                 <span>Creating Profile...</span>

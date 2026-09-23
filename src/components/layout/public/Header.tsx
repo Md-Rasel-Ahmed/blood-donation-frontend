@@ -44,8 +44,6 @@ export default function Header() {
   const { data: user, isLoading } = useGetMe();
   const { mutate: logout, isPending } = useLogout();
   const queryClient = useQueryClient();
-  // Auth & Notifications Data
-  // const user =undefined
 
   const notifications = [
     {
@@ -80,6 +78,8 @@ export default function Header() {
       },
     });
   };
+
+  const lowerCaseRole = user?.data.role.toLowerCase() || "patient";
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-rose-100 bg-white/95 backdrop-blur-md">
@@ -117,7 +117,7 @@ export default function Header() {
           )}
 
           {user?.data.role === "PATIENT" && (
-            <Link href="/create-request">
+            <Link href="dashboard/patient/create-blood-request">
               <Button
                 variant="outline"
                 size="sm"
@@ -131,7 +131,7 @@ export default function Header() {
 
           {user?.data.role === "ADMIN" && (
             <Link
-              href="/admin/dashboard"
+              href="/dashboard"
               className="flex items-center gap-1.5 font-semibold text-slate-800 hover:text-rose-600 transition-colors"
             >
               <LayoutDashboard className="h-4 w-4 text-rose-600" />
@@ -200,19 +200,16 @@ export default function Header() {
                 onOpenChange={setIsProfileOpen}
               >
                 <DropdownMenuTrigger>
-                  <button
-                    type="button"
-                    className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 focus:outline-none transition-colors cursor-pointer border-0 bg-transparent"
-                  >
+                  <div className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 focus:outline-none transition-colors cursor-pointer border-0 bg-transparent">
                     <Avatar className="h-8 w-8 bg-rose-600 text-white">
                       <AvatarFallback className="bg-rose-600 text-white font-semibold">
                         {user?.data.name.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium text-slate-700">
-                      {user.name}
+                      {user?.data.name}
                     </span>
-                  </button>
+                  </div>
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
@@ -235,7 +232,7 @@ export default function Header() {
                   <DropdownMenuSeparator />
 
                   <DropdownMenuGroup>
-                    <Link href={"/dashboard"}>
+                    <Link href={`/dashboard/${lowerCaseRole}/profile`}>
                       <DropdownMenuItem className="cursor-pointer flex items-center gap-2 w-full p-2 hover:bg-rose-50 rounded-md">
                         <User className="h-4 w-4" />
                         <span>My Profile</span>
@@ -395,7 +392,7 @@ export default function Header() {
 
             {user?.data.role === "ADMIN" && (
               <Link
-                href="/admin/dashboard"
+                href="/dashboard"
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors font-semibold"
               >
@@ -406,7 +403,7 @@ export default function Header() {
 
             {user?.data && (
               <Link
-                href="/profile"
+                href={`/dashboard/${lowerCaseRole}/profile`}
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="flex items-center gap-2 p-2 rounded-lg hover:bg-rose-50 hover:text-rose-600 transition-colors"
               >
@@ -421,7 +418,7 @@ export default function Header() {
             {user?.data ? (
               <Button
                 variant="destructive"
-                className="w-full justify-center gap-2 bg-rose-600 hover:bg-rose-700"
+                className="w-full text-white justify-center gap-2 bg-rose-600 hover:bg-rose-700"
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />

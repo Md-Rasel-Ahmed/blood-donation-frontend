@@ -27,18 +27,21 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TQueryPrams } from "@/types/TQueryPrams";
+import AllUserLoading from "@/components/layout/dashboard/admin/AllUserLoading";
+import { useDebounce } from "@/hooks/debounce.hook";
 
 export default function GetAllDonors() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBloodGroup, setSelectedBloodGroup] = useState("ALL");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [limit, setLimit] = useState("10");
+  const debounceValue = useDebounce(searchTerm);
 
   const queryPrams: TQueryPrams = {
     bloodGroup: selectedBloodGroup === "ALL" ? undefined : selectedBloodGroup,
     sortOrder: sortOrder,
     limit: Number(limit),
-    searchTerm,
+    searchTerm: debounceValue,
   };
   const { data: donors, isPending } = useGetAllDonor(queryPrams);
   const allDonor = donors?.data.data || [];
@@ -142,6 +145,10 @@ export default function GetAllDonors() {
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/70 text-xs sm:text-sm">
+            {isPending &&
+              [1, 2, 3].map((item) => (
+                <AllUserLoading key={item}></AllUserLoading>
+              ))}
             {allDonor.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-10 text-center text-slate-500">

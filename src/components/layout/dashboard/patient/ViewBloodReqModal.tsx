@@ -33,7 +33,6 @@ export default function ViewBloodReqModal({
 }: ViewBloodReqProps) {
   const { data: bloodReqById, isLoading } = useGetBloodReqById(id as string);
 
-  console.log(viewOnClose);
   return (
     <Dialog open={viewIsOpen} onOpenChange={viewOnClose}>
       <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-white p-6 sm:p-8 rounded-3xl shadow-2xl">

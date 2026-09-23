@@ -12,68 +12,38 @@ import {
   Phone,
   Clock,
   Send,
+  Loader2,
 } from "lucide-react";
+import { useAcceptedRequest, useGetMatchRequests } from "@/hooks/donor.hook";
+import { toast } from "@/components/ui/toast";
 
-export interface BloodRequest {
-  id: string;
-  patientName: string;
-  bloodGroup: string;
-  hospitalName: string;
-  district: string;
-  upazila: string;
-  neededBy: string;
-  urgency: "CRITICAL" | "EMERGENCY" | "NORMAL";
-  bagsNeeded: number;
-  contactPhone?: string;
-}
+export default function MatchedRequests() {
+  const { data: matchRequests, isPending: matchPending } =
+    useGetMatchRequests();
+  const { mutate: acceptedRequest, isPending } = useAcceptedRequest();
 
-interface MatchedRequestsProps {
-  donorBloodGroup: string;
-  donorLocation: string; // e.g., "Mirpur, Dhaka"
-  requests?: BloodRequest[];
-  onRespond?: (requestId: string) => void;
-}
+  const handleAccepet = (id: string) => {
+    acceptedRequest(id, {
+      onSuccess: (res) => {
+        toast.add({
+          title: res.message || "Request Accepted Successfull",
+          type: "success",
+        });
+      },
+      onError: (err: any) => {
+        const errorMessage =
+          err?.data?.message ||
+          err?.data?.error ||
+          err?.message ||
+          "Something Went Wrong";
 
-// ফরম্যাটিং হেলপার ফানশন
-const formatBloodGroup = (bg: string) => {
-  if (!bg) return "";
-  return bg.replace("_POSITIVE", "+").replace("_NEGATIVE", "-");
-};
-
-// ডামি ডাটা
-const defaultRequests: BloodRequest[] = [
-  {
-    id: "req-101",
-    patientName: "Kamal Hossain",
-    bloodGroup: "O_POSITIVE",
-    hospitalName: "Labaid Hospital",
-    district: "Dhaka",
-    upazila: "Dhanmondi",
-    neededBy: "2026-09-20",
-    urgency: "CRITICAL",
-    bagsNeeded: 2,
-    contactPhone: "01711111111",
-  },
-  {
-    id: "req-102",
-    patientName: "Nusrat Jahan",
-    bloodGroup: "O_POSITIVE",
-    hospitalName: "Ibn Sina Hospital",
-    district: "Dhaka",
-    upazila: "Mirpur",
-    neededBy: "2026-09-22",
-    urgency: "EMERGENCY",
-    bagsNeeded: 1,
-    contactPhone: "01822222222",
-  },
-];
-
-export default function MatchedRequests({
-  donorBloodGroup,
-  donorLocation,
-  requests = defaultRequests,
-  onRespond,
-}: MatchedRequestsProps) {
+        toast.add({
+          title: errorMessage,
+          type: "error",
+        });
+      },
+    });
+  };
   return (
     <div className="w-full max-w-4xl mx-auto bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 text-white shadow-2xl my-6">
       {/* Header */}
@@ -86,21 +56,28 @@ export default function MatchedRequests({
           <p className="text-slate-400 text-xs sm:text-sm mt-1">
             Requests matching your blood group (
             <span className="text-rose-400 font-bold">
-              {formatBloodGroup(donorBloodGroup)}
+              {/* {formatBloodGroup(donorBloodGroup)} */}
             </span>
-            ) & location (
-            <span className="text-slate-200 font-medium">{donorLocation}</span>)
+            ) & location (<span className="text-slate-200 font-medium">{}</span>
+            )
           </p>
         </div>
 
         <div className="self-start sm:self-auto bg-rose-500/10 border border-rose-500/20 px-3.5 py-1.5 rounded-xl text-xs text-rose-400 font-semibold">
-          {requests.length} Direct Matches
+          {matchRequests?.data.length} Direct Matches
         </div>
       </div>
 
+      {matchPending && (
+        <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
+          <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
+          <p className="text-sm font-medium">Loading Match Requests...</p>
+        </div>
+      )}
+
       {/* Requests List */}
       <div className="space-y-4">
-        {requests.length === 0 ? (
+        {matchRequests?.data.length === 0 ? (
           <div className="py-14 text-center text-slate-500 bg-slate-950/40 rounded-2xl border border-slate-800/50">
             <Droplet className="w-10 h-10 text-slate-700 mx-auto mb-3" />
             <p className="text-sm font-medium">
@@ -108,7 +85,7 @@ export default function MatchedRequests({
             </p>
           </div>
         ) : (
-          requests.map((request) => (
+          matchRequests?.data.map((request) => (
             <div
               key={request.id}
               className="bg-slate-950/70 border border-slate-800 hover:border-slate-700/80 rounded-2xl p-4 sm:p-6 transition-all space-y-4"
@@ -118,7 +95,8 @@ export default function MatchedRequests({
                 <div className="flex items-center gap-3.5">
                   <div className="w-12 h-12 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex flex-col items-center justify-center text-rose-500 font-bold leading-none">
                     <span className="text-base">
-                      {formatBloodGroup(request.bloodGroup)}
+                      {request.bloodGroup.slice(0, 3)}
+                      {/* {formatBloodGroup(request.bloodGroup)} */}
                     </span>
                     <span className="text-[9px] uppercase font-normal text-slate-400 mt-1">
                       {request.bagsNeeded} Bag
@@ -169,10 +147,10 @@ export default function MatchedRequests({
 
               {/* Action Bar */}
               <div className="flex items-center justify-between border-t border-slate-800/80 pt-3.5">
-                {request.contactPhone ? (
+                {request.patient.phone ? (
                   <div className="flex items-center gap-1.5 text-xs text-slate-400">
                     <Phone className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Contact: {request.contactPhone}</span>
+                    <span>Contact: {request.patient.phone}</span>
                   </div>
                 ) : (
                   <span className="text-xs text-slate-500">
@@ -181,11 +159,12 @@ export default function MatchedRequests({
                 )}
 
                 <Button
-                  onClick={() => onRespond && onRespond(request.id)}
+                  // onClick={() => onRespond && onRespond(request.id)}
+                  onClick={() => handleAccepet(request.id)}
                   className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-medium rounded-xl flex items-center gap-2 shadow-lg shadow-rose-600/20 transition-all cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
-                  <span>Respond to Request</span>
+                  <span>{isPending ? "Accepeting.." : "Accepet"}</span>
                 </Button>
               </div>
             </div>

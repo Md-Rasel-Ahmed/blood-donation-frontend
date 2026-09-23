@@ -1,6 +1,6 @@
-import { getAllBloodRequest, getAllDonors, getAllUsers } from "@/api/admin.api"
+import { deleteFaceBloodReq, deleteUser, getAllBloodRequest, getAllDonors, getAllUsers, updateBloodReqStatus, updateUser } from "@/api/admin.api"
 import { TQueryPrams } from "@/types/TQueryPrams"
-import { useQuery } from "@tanstack/react-query"
+import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useGetAllUsers=(prams:TQueryPrams)=>{
     return useQuery({
@@ -19,4 +19,43 @@ export const useGetAllBloodRequest=(prams:TQueryPrams)=>{
         queryKey:["bloodRequest",prams],
         queryFn:()=>getAllBloodRequest(prams)
     })
+}
+
+
+export const useDeleteUser=()=>{
+  const queryClient=useQueryClient()
+ return useMutation({
+    mutationFn:deleteUser,
+       onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["users"]})
+    }
+  })
+}
+export const useDeleteFakeBloodReq=()=>{
+   const queryClient=useQueryClient()
+ return useMutation({
+    mutationFn:deleteFaceBloodReq,
+      onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["bloodRequest"]})
+    }
+  })
+}
+export const useUpdateUser=()=>{
+  const queryClient=useQueryClient()
+ return useMutation({
+    mutationFn:updateUser,
+    onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["users"]})
+    }
+  })
+}
+export const useUpdateBloodReqStatus=()=>{
+   const queryClient=useQueryClient()
+ return useMutation({
+    mutationFn:updateBloodReqStatus,
+      onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["bloodRequest"]})
+    }
+    
+  })
 }

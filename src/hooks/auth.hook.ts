@@ -1,5 +1,5 @@
 import { getMe, gooleLoginCallback, register, resendOTP, userLogin, userLogout, verifyEmail } from "@/api"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useLogin=()=>{
     return useMutation({
@@ -7,8 +7,12 @@ export const useLogin=()=>{
     })
 }
 export const useLogout=()=>{
+    const queryClient=useQueryClient()
     return useMutation({
         mutationFn:userLogout,
+        onSuccess:()=>{
+            queryClient.invalidateQueries({queryKey:["user"]})
+        }
     
     })
 }

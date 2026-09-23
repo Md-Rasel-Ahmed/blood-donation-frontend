@@ -24,48 +24,6 @@ import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodRe
 import EditBloodReq from "@/components/layout/dashboard/patient/EditBloodReq";
 import { toast } from "@/components/ui/toast";
 
-const MOCK_REQUESTS = [
-  {
-    id: "req-01",
-    patientName: "Rahat Chowdhury",
-    bloodGroup: "O+",
-    unitsNeeded: 2,
-    hospitalName: "Dhaka Medical College Hospital",
-    district: "Dhaka",
-    area: "Dhanmondi",
-    neededDate: "2026-09-20",
-    urgency: "Critical",
-    status: "Pending", // Pending | Approved | Completed | Cancelled
-    createdAt: "2026-09-16",
-  },
-  {
-    id: "req-02",
-    patientName: "Sumi Akter",
-    bloodGroup: "AB-",
-    unitsNeeded: 1,
-    hospitalName: "Square Hospital",
-    district: "Dhaka",
-    area: "Panthapath",
-    neededDate: "2026-09-25",
-    urgency: "Normal",
-    status: "Approved",
-    createdAt: "2026-09-14",
-  },
-  {
-    id: "req-03",
-    patientName: "Abdul Karim",
-    bloodGroup: "B+",
-    unitsNeeded: 3,
-    hospitalName: "Chittagong Medical College",
-    district: "Chittagong",
-    area: "Panchlaish",
-    neededDate: "2026-09-10",
-    urgency: "Critical",
-    status: "Completed",
-    createdAt: "2026-09-08",
-  },
-];
-
 export default function MyBloodRequests() {
   const [filterStatus, setFilterStatus] = useState("All");
   const [viewIsOpen, setViewIsOpen] = useState(false);
