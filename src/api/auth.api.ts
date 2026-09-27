@@ -39,3 +39,9 @@ export const resendOTP=(payload:{email:string})=>{
         body:payload
     })
 }
+export const updateProfile=(data:any)=>{
+        return apiClient("/users/edit-me",{
+        method:"PATCH",
+        body:JSON.parse(data)
+    })
+}

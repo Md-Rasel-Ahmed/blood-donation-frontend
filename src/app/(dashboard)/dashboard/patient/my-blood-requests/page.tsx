@@ -23,6 +23,7 @@ import { Spinner } from "@/components/ui/spinner";
 import ViewBloodReqModal from "@/components/layout/dashboard/patient/ViewBloodReqModal";
 import EditBloodReq from "@/components/layout/dashboard/patient/EditBloodReq";
 import { toast } from "@/components/ui/toast";
+import { TablePagination } from "@/components/ui/table.pagination";
 
 export default function MyBloodRequests() {
   const [filterStatus, setFilterStatus] = useState("All");
@@ -32,6 +33,7 @@ export default function MyBloodRequests() {
   const [editOnClose, setEditOnClose] = useState(true);
   const [viewOnClose, setViewOnClose] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [selectedPage, setSelectedPage] = useState(1);
 
   const { data: myBloodRequests, isLoading, refetch } = useGetMyBloodRequests();
   const { mutate: updateStatus, isPending } = useUpdateBloodRequestStatus();
@@ -70,7 +72,7 @@ export default function MyBloodRequests() {
   };
   const handleViewCloseModal = () => {
     setViewIsOpen(false);
-    setViewOnClose(true);
+    setViewOnClose(false);
     setSelectedId("");
     refetch();
   };
@@ -292,12 +294,13 @@ export default function MyBloodRequests() {
               </div>
             </div>
           ))}
+        <TablePagination></TablePagination>
       </div>
       <ViewBloodReqModal
         key={selectedId}
         id={selectedId}
         viewIsOpen={viewIsOpen}
-        viewOnClose={handleViewCloseModal}
+        viewOnClose={() => setViewIsOpen(false)}
       ></ViewBloodReqModal>
       <EditBloodReq
         key={selectedId}

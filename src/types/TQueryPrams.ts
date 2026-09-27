@@ -6,6 +6,7 @@ export type TQueryPrams ={
     searchTerm?:string,
     limit?:number,
     bloodGroup?:string,
-    urgency?:string
+    urgency?:string,
+    page:number
    
 }

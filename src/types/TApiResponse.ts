@@ -4,5 +4,12 @@ export type TApiResponse <T> = {
     message:string,
     data:{
         data:T
+        meta:{
+            page:number,
+            total:number,
+            limit:number,
+            totalPage:number
+            
+        }
     }
 }

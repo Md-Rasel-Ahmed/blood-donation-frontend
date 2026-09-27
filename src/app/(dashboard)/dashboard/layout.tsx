@@ -13,6 +13,11 @@ import {
   Bell,
   PlusCircle,
   Search,
+  UserPlus,
+  History,
+  GitCompare,
+  Users,
+  Droplets,
 } from "lucide-react";
 import { Button } from "@base-ui/react";
 import { useGetMe, useLogout } from "@/hooks";
@@ -35,30 +40,82 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const { mutate: logout } = useLogout();
 
   const patientRoutes = [
-    { name: "Dashboard", url: "/dashboard" },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+    },
     {
       name: "Create Blood Request",
       url: "/dashboard/patient/create-blood-request",
+      icon: <PlusCircle className="w-4 h-4" />,
     },
-    { name: "My Blood Requests", url: "/dashboard/patient/my-blood-requests" },
-    { name: "Profile", url: "/dashboard/patient/profile" },
+    {
+      name: "My Blood Requests",
+      url: "/dashboard/patient/my-blood-requests",
+      icon: <Droplet className="w-4 h-4" />,
+    },
+    {
+      name: "Profile",
+      url: "/dashboard/patient/profile",
+      icon: <User className="w-4 h-4" />,
+    },
   ];
+
   const donorRoutes = [
-    { name: "Dashboard", url: "/dashboard" },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+    },
     {
       name: "Create Donor Profile",
       url: "/dashboard/donor/create-donor-profile",
+      icon: <UserPlus className="w-4 h-4" />,
     },
-    { name: "Donation History", url: "/dashboard/donor/donation-history" },
-    { name: "Match Requests", url: "/dashboard/donor/match-requests" },
-    { name: "Profile", url: "/dashboard/donor/profile" },
+    {
+      name: "Donation History",
+      url: "/dashboard/donor/donation-history",
+      icon: <History className="w-4 h-4" />,
+    },
+    {
+      name: "Match Requests",
+      url: "/dashboard/donor/match-requests",
+      icon: <GitCompare className="w-4 h-4" />,
+    },
+    {
+      name: "Profile",
+      url: "/dashboard/donor/profile",
+      icon: <User className="w-4 h-4" />,
+    },
   ];
+
   const adminRoutes = [
-    { name: "Dashboard", url: "/dashboard" },
-    { name: "All Users", url: "/dashboard/admin/all-users" },
-    { name: "All Donor", url: "/dashboard/admin/all-donors" },
-    { name: "All Blood Requests", url: "/dashboard/admin/all-blood-requests" },
-    { name: "Profile", url: "/dashboard/admin/profile" },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: <LayoutDashboard className="w-4 h-4" />,
+    },
+    {
+      name: "All Users",
+      url: "/dashboard/admin/all-users",
+      icon: <Users className="w-4 h-4" />,
+    },
+    {
+      name: "All Donor",
+      url: "/dashboard/admin/all-donors",
+      icon: <HeartHandshake className="w-4 h-4" />,
+    },
+    {
+      name: "All Blood Requests",
+      url: "/dashboard/admin/all-blood-requests",
+      icon: <Droplets className="w-4 h-4" />,
+    },
+    {
+      name: "Profile",
+      url: "/dashboard/admin/profile",
+      icon: <User className="w-4 h-4" />,
+    },
   ];
 
   const routes = useMemo(() => {
@@ -205,7 +262,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                         : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60" // Normal Class
                     }`}
                   >
-                    <LayoutDashboard className="w-4 h-4" />
+                    {route.icon}
                     <span>{route.name}</span>
                   </Link>
                 );

@@ -24,13 +24,15 @@ import { toast } from "@/components/ui/toast";
 import EditUserModal from "@/components/layout/dashboard/admin/EditUserModal";
 import { IUser } from "@/types/IUser";
 import { useDebounce } from "@/hooks/debounce.hook";
+import { TablePagination } from "@/components/ui/table.pagination";
 
 export default function GetAllUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("ALL");
   const [sortOrder, setSortOrder] = useState("desc");
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(2);
   const debounceValue = useDebounce(searchTerm);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
   const [user, setUser] = useState({});
@@ -40,12 +42,13 @@ export default function GetAllUsers() {
     status: selectedStatus === "ALL" ? undefined : selectedStatus,
     searchTerm: debounceValue,
     limit: Number(limit),
+    page: currentPage,
   };
 
   const { data: users, isPending, refetch } = useGetAllUsers(queryPrams);
   const { mutate: deleteUser } = useDeleteUser();
   const allUsers = users?.data.data || [];
-
+  const totalPage = users?.data.meta.totalPage;
   // delete user
   const handleUserDelete = (email: string) => {
     Swal.fire({
@@ -273,6 +276,11 @@ export default function GetAllUsers() {
           </tbody>
         </table>
       </div>
+      <TablePagination
+        totalPage={totalPage}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+      ></TablePagination>
       <EditUserModal
         isOpen={isOpenModal}
         onClose={() => setIsOpenModal(false)}
