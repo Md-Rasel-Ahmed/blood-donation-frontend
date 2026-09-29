@@ -45,3 +45,15 @@ export const updateProfile=(data:any)=>{
         body:JSON.parse(data)
     })
 }
+export const forgotPassword=(email:string)=>{
+        return apiClient("/auth/forgot-password",{
+        method:"POST",
+        body:JSON.stringify({email})
+    })
+}
+export const resetPassword=(payload:{email:string,otp:string,newPassword:string})=>{
+        return apiClient("/auth/reset-password",{
+        method:"POST",
+        body:JSON.stringify(payload)
+    })
+}

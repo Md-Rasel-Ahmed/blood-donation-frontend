@@ -18,6 +18,7 @@ import {
   GitCompare,
   Users,
   Droplets,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@base-ui/react";
 import { useGetMe, useLogout } from "@/hooks";
@@ -95,6 +96,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
       name: "Dashboard",
       url: "/dashboard",
       icon: <LayoutDashboard className="w-4 h-4" />,
+    },
+    {
+      name: "Analytics",
+      url: "/dashboard/admin/Analytics",
+      icon: <BarChart3 className="w-4 h-4" />,
     },
     {
       name: "All Users",
