@@ -52,7 +52,7 @@ export function TablePagination({ ...props }) {
 
         {getTotalPages?.map((page, index) => {
           return page === "..." ? (
-            <PaginationItem key={`ellipsis-${index}`}>
+            <PaginationItem key={`ellipsis-${page}`}>
               <PaginationEllipsis />
             </PaginationItem>
           ) : (
