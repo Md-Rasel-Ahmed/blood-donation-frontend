@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Mail, KeyRound, Lock, ArrowLeft, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useForgotPassword, useResetPassword } from "@/hooks";
+import { useForgotPassword, useResetPassword, useSendEmailOTP } from "@/hooks";
 import { toast } from "@/components/ui/toast";
 import { useRouter } from "next/navigation";
 
@@ -17,6 +17,7 @@ export default function ForgotPassword() {
 
   const { mutate: forgotPassword, isPending, isSuccess } = useForgotPassword();
   const { mutate: resetPassword, isPending: resetPending } = useResetPassword();
+  const { mutate: sendOTP } = useSendEmailOTP();
 
   // sned email otp
   const sendEmailOtp = () => {
@@ -54,6 +55,33 @@ export default function ForgotPassword() {
       onSuccess: (res) => {
         toast.add({
           title: res.message || "Password Reset Successfull",
+          type: "success",
+        });
+        router.push("/login");
+      },
+      onError: (err: any) => {
+        const errorMessage =
+          err?.data?.message ||
+          err?.data?.error ||
+          err?.message ||
+          "Something Went Wrong";
+
+        toast.add({
+          title: errorMessage,
+          type: "error",
+        });
+      },
+    });
+  };
+
+  const handleSendEmailOTP = () => {
+    if (!email) {
+      return;
+    }
+    sendOTP(email, {
+      onSuccess: (res) => {
+        toast.add({
+          title: res.message || "Email OTP Sent Successfull",
           type: "success",
         });
         router.push("/login");
@@ -165,7 +193,9 @@ export default function ForgotPassword() {
                 className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 transition-colors tracking-widest"
               />
             </div>
-            <Button variant={"link"}>Resend OTP</Button>
+            <Button onClick={handleSendEmailOTP} variant={"link"}>
+              Resend OTP
+            </Button>
           </div>
 
           {/* 🔒 Step 3: New Password Input */}

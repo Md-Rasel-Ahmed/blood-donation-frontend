@@ -14,19 +14,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { useForm } from "@tanstack/react-form";
 import { useUpdateProfile } from "@/hooks";
+import { toast } from "@/components/ui/toast";
 
 export default function EditProfileModal({
   isOpen,
   onClose,
+  setIsopen,
   user,
 }: {
   isOpen?: boolean;
-  onClose?: () => void;
+  setIsopen?: boolean;
+  onClose: () => void;
   user: any;
 }) {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { mutate: updateProfile, isPending } = useUpdateProfile();
-  const formData = new FormData();
+
   const form = useForm({
     defaultValues: {
       name: user?.name || "",
@@ -37,12 +40,6 @@ export default function EditProfileModal({
     },
 
     onSubmit: async ({ value }) => {
-      formData.append("name", value.name);
-      formData.append("phone", value.phone);
-      formData.append("district", value.district);
-      formData.append("upazila", value.upazila);
-      formData.append("address", value.address);
-
       const profileData = {
         name: value.name,
         phone: value.phone,
@@ -50,12 +47,26 @@ export default function EditProfileModal({
         upazila: value.upazila,
         address: value.address,
       };
-      updateProfile(formData, {
+
+      updateProfile(profileData, {
         onSuccess: (res) => {
-          console.log("profle update success");
+          onClose();
+          toast.add({
+            title: res.message || "Profile Update Success",
+            type: "success",
+          });
         },
-        onError: (err) => {
-          console.log("Profile update error");
+        onError: (err: any) => {
+          const errorMessage =
+            err?.data?.message ||
+            err?.data?.error ||
+            err?.message ||
+            "Something Went Wrong";
+          console.log(errorMessage);
+          toast.add({
+            title: errorMessage,
+            type: "error",
+          });
         },
       });
     },
@@ -238,7 +249,7 @@ export default function EditProfileModal({
               className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl px-5 py-2 text-xs font-semibold shadow-lg shadow-rose-900/30 flex items-center gap-2 cursor-pointer transition-all"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>Save Changes</span>
+              <span>{isPending ? "Save Changing.." : "Save Changes"}</span>
             </Button>
           </div>
         </form>

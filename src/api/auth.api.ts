@@ -39,10 +39,16 @@ export const resendOTP=(payload:{email:string})=>{
         body:payload
     })
 }
-export const updateProfile=(data:any)=>{
+export const updateProfile=(profileData:any,profileImg:any)=>{
+    // const profileData=data.data
+    console.log(profileData);
+    const formData=new FormData()
+    formData.append("data",JSON.stringify(profileData))
+    formData.append("image",profileData)
         return apiClient("/users/edit-me",{
-        method:"PATCH",
-        body:JSON.parse(data)
+    method:"PATCH",
+       body:formData,
+   
     })
 }
 export const forgotPassword=(email:string)=>{
@@ -55,5 +61,11 @@ export const resetPassword=(payload:{email:string,otp:string,newPassword:string}
         return apiClient("/auth/reset-password",{
         method:"POST",
         body:JSON.stringify(payload)
+    })
+}
+export const sendEmailOTP=(email:string)=>{
+        return apiClient("/auth/sent-otp",{
+        method:"POST",
+        body:JSON.stringify({email})
     })
 }

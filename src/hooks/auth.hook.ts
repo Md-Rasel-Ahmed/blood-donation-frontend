@@ -1,4 +1,4 @@
-import { forgotPassword, getMe, gooleLoginCallback, register, resendOTP, resetPassword, updateProfile, userLogin, userLogout, verifyEmail } from "@/api"
+import { forgotPassword, getMe, gooleLoginCallback, register, resendOTP, resetPassword, sendEmailOTP, updateProfile, userLogin, userLogout, verifyEmail } from "@/api"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useLogin=()=>{
@@ -50,8 +50,12 @@ export const useResendOTP=()=>{
     })
 }
 export const useUpdateProfile=()=>{
+     const queryClient=useQueryClient()
     return useMutation({
-        mutationFn:updateProfile
+        mutationFn:updateProfile,
+         onSuccess:()=>{
+      queryClient.invalidateQueries({queryKey:["user"]})
+    }
     })
 }
 export const useForgotPassword=()=>{
@@ -62,5 +66,10 @@ export const useForgotPassword=()=>{
 export const useResetPassword=()=>{
     return useMutation({
         mutationFn:resetPassword
+    })
+}
+export const useSendEmailOTP=()=>{
+    return useMutation({
+        mutationFn:sendEmailOTP
     })
 }

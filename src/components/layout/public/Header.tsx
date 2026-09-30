@@ -35,6 +35,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useGetMe, useLogout } from "@/hooks";
 import { toast } from "@/components/ui/toast";
 import { useQueryClient } from "@tanstack/react-query";
+import Image from "next/image";
 
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -201,11 +202,22 @@ export default function Header() {
               >
                 <DropdownMenuTrigger>
                   <div className="flex items-center gap-2 p-1.5 rounded-full hover:bg-slate-100 focus:outline-none transition-colors cursor-pointer border-0 bg-transparent">
-                    <Avatar className="h-8 w-8 bg-rose-600 text-white">
-                      <AvatarFallback className="bg-rose-600 text-white font-semibold">
-                        {user?.data.name.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
+                    {user?.data.imgURL ? (
+                      <div className="w-10 h-10 border rounded-full overflow-hidden">
+                        <Image
+                          src={user?.data.imgURL}
+                          alt={user?.data.name}
+                          width={100}
+                          height={100}
+                        />
+                      </div>
+                    ) : (
+                      <Avatar className="h-8 w-8 bg-rose-600 text-white">
+                        <AvatarFallback className="bg-rose-600 text-white font-semibold">
+                          {user?.data.name.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
                     <span className="text-sm font-medium text-slate-700">
                       {user?.data.name}
                     </span>
@@ -342,11 +354,22 @@ export default function Header() {
           {/* User Info (Mobile) */}
           {user && (
             <div className="flex items-center gap-3 p-3 rounded-xl bg-rose-50/60 border border-rose-100">
-              <Avatar className="h-10 w-10 bg-rose-600 text-white">
-                <AvatarFallback className="bg-rose-600 text-white font-semibold">
-                  {user?.data.name.charAt(0)}
-                </AvatarFallback>
-              </Avatar>
+              {user?.data.imgURL ? (
+                <div className="w-10 h-10 border rounded-full overflow-hidden">
+                  <Image
+                    src={user?.data.imgURL}
+                    alt={user?.data.name}
+                    width={100}
+                    height={100}
+                  />
+                </div>
+              ) : (
+                <Avatar className="h-8 w-8 bg-rose-600 text-white">
+                  <AvatarFallback className="bg-rose-600 text-white font-semibold">
+                    {user?.data.name.charAt(0)}
+                  </AvatarFallback>
+                </Avatar>
+              )}
               <div className="flex flex-col">
                 <span className="text-sm font-semibold text-slate-800">
                   {user?.data.name}
