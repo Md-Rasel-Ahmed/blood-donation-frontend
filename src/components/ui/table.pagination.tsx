@@ -32,7 +32,11 @@ const getPaginationButton = (currentPage: number, totalPage: number) => {
 };
 
 export function TablePagination({ ...props }) {
-  const getTotalPages = getPaginationButton(props.currentPage, props.totalPage);
+  console.log(props);
+  const getTotalPages = getPaginationButton(
+    props?.currentPage,
+    props?.totalPage,
+  );
 
   return (
     <Pagination>
@@ -52,11 +56,11 @@ export function TablePagination({ ...props }) {
 
         {getTotalPages?.map((page, index) => {
           return page === "..." ? (
-            <PaginationItem key={`ellipsis-${page}`}>
+            <PaginationItem key={`ellipsis-${index}`}>
               <PaginationEllipsis />
             </PaginationItem>
           ) : (
-            <PaginationItem key={page}>
+            <PaginationItem key={`ellipsis-${index}`}>
               <PaginationLink
                 isActive={props.currentPage === page}
                 onClick={() => {

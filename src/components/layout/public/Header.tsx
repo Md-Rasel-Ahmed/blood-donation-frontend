@@ -101,6 +101,12 @@ export default function Header() {
             Home
           </Link>
           <Link
+            href="/donation"
+            className="hover:text-rose-600 transition-colors"
+          >
+            Make Donation
+          </Link>
+          <Link
             href="/blood-requests"
             className="hover:text-rose-600 transition-colors"
           >

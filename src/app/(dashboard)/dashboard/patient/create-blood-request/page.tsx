@@ -497,10 +497,13 @@ export default function CreateBloodRequestUI() {
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={isPending}
             className="w-full bg-rose-600 hover:bg-rose-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-rose-600/20 flex items-center justify-center gap-2 text-sm cursor-pointer mt-4"
           >
             <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-            <span>Post Blood Request</span>
+            <span>
+              {isPending ? "Posting Blood Request.." : "Post Blood Request"}
+            </span>
           </button>
         </form>
       </div>

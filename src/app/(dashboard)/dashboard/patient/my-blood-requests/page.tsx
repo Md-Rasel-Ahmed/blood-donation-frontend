@@ -294,13 +294,13 @@ export default function MyBloodRequests() {
               </div>
             </div>
           ))}
-        <TablePagination></TablePagination>
+        {/* <TablePagination currentPage={1} totalPage={1}></TablePagination> */}
       </div>
       <ViewBloodReqModal
         key={selectedId}
         id={selectedId}
         viewIsOpen={viewIsOpen}
-        viewOnClose={() => setViewIsOpen(false)}
+        viewOnClose={setViewIsOpen}
       ></ViewBloodReqModal>
       <EditBloodReq
         key={selectedId}

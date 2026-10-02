@@ -32,7 +32,7 @@ export default function ViewBloodReqModal({
   viewOnClose,
 }: ViewBloodReqProps) {
   const { data: bloodReqById, isLoading } = useGetBloodReqById(id as string);
-
+  console.log(viewIsOpen);
   return (
     <Dialog open={viewIsOpen} onOpenChange={viewOnClose}>
       <DialogContent className="max-w-lg bg-slate-900 border-slate-800 text-white p-6 sm:p-8 rounded-3xl shadow-2xl">
@@ -72,82 +72,6 @@ export default function ViewBloodReqModal({
           </div>
         </div>
         {/* Details Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-          {/* Patient Name */}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <User className="w-3.5 h-3.5 text-slate-500" /> Patient Name
-            </p>
-            <p className="font-semibold text-white">
-              {bloodReqById?.data.patientName}
-            </p>
-          </div>
-
-          {/* Contact Number */}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5 text-slate-500" /> Contact Number
-            </p>
-            <a
-              href={`tel:${bloodReqById?.data.patient.phone}`}
-              className="font-semibold text-rose-400 hover:underline"
-            >
-              {bloodReqById?.data.patient.phone}
-            </a>
-          </div>
-
-          {/* Hospital */}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <Building className="w-3.5 h-3.5 text-slate-500" /> Hospital /
-              Clinic
-            </p>
-            <p className="font-semibold text-white">
-              {bloodReqById?.data.hospitalName}
-            </p>
-          </div>
-
-          {/* Location */}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-slate-500" /> Location
-            </p>
-            <p className="font-semibold text-white">
-              {bloodReqById?.data.upazila}
-              {bloodReqById?.data.district}
-            </p>
-          </div>
-
-          {/* Needed Date */}
-          <div className="space-y-1">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <Calendar className="w-3.5 h-3.5 text-slate-500" /> Date Required
-            </p>
-            <p className="font-semibold text-white">
-              {bloodReqById?.data.neededBy}
-            </p>
-          </div>
-
-          {/* Needed Time */}
-          {/* <div className="space-y-1">
-              <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-slate-500" /> Time Required
-              </p>
-              <p className="font-semibold text-white">{dummyData.neededTime}</p>
-            </div>
-          </div> */}
-
-          {/* Reason / Additional Note */}
-          <div className="space-y-1.5 border-t border-slate-800 pt-4">
-            <p className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5 text-slate-500" /> Medical Reason
-              / Notes
-            </p>
-            <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/40 p-3.5 rounded-xl border border-slate-800/80">
-              {bloodReqById?.data.details}
-            </p>
-          </div>
-        </div>
       </DialogContent>
     </Dialog>
   );
